@@ -1,0 +1,50 @@
+
+[functions.verify-otp]
+enabled = true
+verify_jwt = false
+import_map = "./functions/verify-otp/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/verify-otp/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/verify-otp/*.html" ]
+
+[functions.create-pin]
+enabled = true
+verify_jwt = false
+import_map = "./functions/create-pin/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/create-pin/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/create-pin/*.html" ]
+
+[functions.verify-pin]
+enabled = true
+verify_jwt = false
+import_map = "./functions/verify-pin/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/verify-pin/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/verify-pin/*.html" ]
+
+[functions.send-otp]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-otp/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/send-otp/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/send-otp/*.html" ]
+
+[functions.send-sms-hook]
+enabled = true
+verify_jwt = false
+import_map = "./functions/send-sms-hook/deno.json"
+entrypoint = "./functions/send-sms-hook/index.ts"

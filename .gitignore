@@ -1,0 +1,19 @@
+# --- Secrets / credentials (NEVER commit) ---
+API_KEYS.txt
+*.key
+*.pem
+.env
+.env.*
+*.local
+
+# --- Supabase local ---
+supabase/.temp/
+supabase/.branches/
+
+# --- Editor / OS ---
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Node (if any tooling is added) ---
+node_modules/
