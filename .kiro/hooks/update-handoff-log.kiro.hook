@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Update Handoff Log",
+  "description": "After each agent turn, append a dated entry to handoff_Kiro_IDE_June14.md describing any code, config, or deployment changes made.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review what was just done in this turn. If any meaningful change was made (file created/edited, config changed, command run, deployment, decision made), append a new row to the Activity Log table in k:\\V-SPED\\VSPED1.0\\handoff_Kiro_IDE_June14.md with the date, a short action title, and details. If nothing meaningful changed (e.g. only a question was answered or files were only read), do NOT modify the document. Do not duplicate an entry that already exists for the same action."
+  }
+}
