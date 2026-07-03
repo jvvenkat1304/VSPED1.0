@@ -189,6 +189,7 @@ Entries are added here automatically as work is performed in this session.
 | July 1, 2026 | Handoff doc major update | Updated title + last-updated date. Added NeuroBridge section, Frontend Strategy section. Replaced stale Pending/Next Steps with ordered actionable list. Clarified FlutterFlow code push must be done by user via Developer Menu. |
 | July 2, 2026 | Handoff doc fully updated and pushed to GitHub | Updated title, last-updated date, backend components, NeuroBridge section, frontend strategy, pending/next steps. Committed and pushed to origin/main. |
 | July 3, 2026 | README rewritten + final pre-handoff push | Replaced empty README.md with full project context: overview, tech stack, repo structure, auth flow summary, current status table, secrets guide, pointer to handoff doc. Committed (f53c6d9) and pushed to origin/main. All context files confirmed current for next session. |
+| July 3, 2026 | Local repo cleaned up + .kiro hooks committed | Removed stale git-tracked root files (AUTH_SETUP, Handoff doc — already archived). Added .kiro/hooks/update-handoff-log.kiro.hook to repo so auto-update hook travels with the project. Local and remote now fully in sync (commit 7cd3bb2). |
 
 ---
 
