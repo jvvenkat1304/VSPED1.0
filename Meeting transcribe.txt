@@ -1,0 +1,730 @@
+School app access and user roles discussion
+
+Venkat (00:00)
+Technologies have been just asking 
+
+Palukuri Karan Dattatreya (Me) (00:03)
+Invite only means. In the middle of that particular school, not every teacher is going to science be on that app. Right? 
+
+Palukuri Karan Dattatreya (Me) (00:13)
+Like some teachers could be like, say, physical education teacher, they don't need the access to that. So are we invite only out 
+
+Venkat (00:20)
+Unnecessarily, so when's the school? The school guard will add the teachers great, and the teachers will So this, I think this, they will mostly use it from a web app view, but the Admin will add the school teachers authorised. He will delete the school teachers, he or she over, right, so they will school teacher will add the children. 
+
+Venkat (00:55)
+Obviously I'd been the school teacher leaves that kind of a thing. For example, Admin can assign a new school teacher to that to replace the all the responsibilities of that old school teacher so attachmented edmin has just a manager school teacher. Students students obviously will have this class blade will have a new together. 
+
+Venkat (01:21)
+Whatever those things inside so they will get children will have that now what will happen over there is that if the so the if the Child is there on the app, there must be some unique way in which When the parent downloads the app on themselves. Okay at the back end, whatever Child Ed is created is unique. Alright, now, when this Child is being added by the teacher. 
+
+Venkat (02:00)
+It has to be able to figure out Whether the Child is already added in the system comparent has already downloaded the app and the Child is already there. Now, how will you how will it know? 
+
+Palukuri Karan Dattatreya (Me) (02:17)
+Or we could make it like this. The Admin makes custom credentials for the login so that there's no conflict between the parents or the Child's personal account and the school account. 
+
+Venkat (02:28)
+I want the parent to be able to see. So the Child is in the middle. Okay, the Child is in the middle, and all the entire ecosystem is around them, correct? 
+
+Palukuri Karan Dattatreya (Me) (02:42)
+Great. 
+
+Venkat (02:43)
+I think we spread the centre of yes, in this case, the parents and the Child around the weeked app Admin. Is there he is adding this Child? Okay, now how do I make sure that he is not ready? 
+
+Venkat (03:02)
+Duplicate site? 
+
+Palukuri Karan Dattatreya (Me) (03:05)
+Classify. 
+
+Venkat (03:06)
+He saw the Child from The system from the offer, the app altogether. 
+
+Palukuri Karan Dattatreya (Me) (03:14)
+We can cross verify with the parents. Mobile number, whatever they're using for the log in 
+
+Venkat (03:19)
+That will lead to complex 
+
+Palukuri Karan Dattatreya (Me) (03:21)
+No, that is so much more simpler. Because it's just a simple skill match. 
+
+Venkat (03:27)
+No, no, what you're saying is this mobile number? That fellow will that fellow every time a Child has to be added. Okay, he will have he will that mobile number sometimes will be old data. 
+
+Venkat (03:44)
+Also, nobody bothers to So it's not a critical thing. What should be done? What should be done? 
+
+Venkat (04:07)
+Right? This would be 118, the parents. He is added to the Child on his own. 
+
+Venkat (04:13)
+Let the Admin film also add the Child on his own. Okay, so temporarily, there are 2 children. 
+
+Palukuri Karan Dattatreya (Me) (04:21)
+For the same Child 
+
+Venkat (04:23)
+Yeah, but it doesn't know. Okay. So the parent, if they want to see basically how the Child is doing in school and there is transparency. 
+
+Venkat (04:40)
+So whatever the teacher is teaching or whatever the updates, we are promising that the parent will be able to see these updates, correct? At that point of time, the parent wants to so since normally knows that the school is the Child is there in the school, and the school also has app once he knows that, or even let's say, he doesn't know that. Also, he tries to identify whether the he finds the school He finds the school, suppose there is. 
+
+Venkat (05:12)
+The school has a unique GPS, correct. What is unique about the school GPS right? Okay, so from the GPS We can get the address. 
+
+Palukuri Karan Dattatreya (Me) (05:33)
+Yes, but that would also be complicated because in Indian, there are a lot of schools which have the similar name, and it could also 
+
+Venkat (05:40)
+Yes, no, no, but the GPS will have 
+
+Palukuri Karan Dattatreya (Me) (05:44)
+Are you no? What I believe is we're adding more points of failures. 
+
+Venkat (05:51)
+This is important. So something has, so the parent has to find the school, and so he knows which way this Child school is no right. So he goes and finds he selects that school, he knows which class is in and he selects that selects the Child name right, and only problem is, parents will get to see the names of children in every school. 
+
+Palukuri Karan Dattatreya (Me) (06:21)
+No, no, we could make it so that in the list of schools now the name of the school, the principal's name those are visible. So when a parent surges for that school name the list pops up with 
+
+Venkat (06:34)
+Those have been something simple. Okay, alright, let us send in. Let us when the when the Child is created, okay, but that also requests parents mobile number to be entered correct so that could be the job of the agreement. 
+
+Venkat (06:53)
+They could upload it through an exercise. 
+
+Palukuri Karan Dattatreya (Me) (06:57)
+That they could do. 
+
+Venkat (06:59)
+Correct that they go to so Drink do and It, we uploaded through an Excel sheet so plaska data uploaded through exact sheet. For this teacher, let's say classka. Data is separate. 
+
+Venkat (07:17)
+Teacher is assigned later. 2 students, 5 teachers could be assigned to the same class. Whatever multiple, many, many, many to many relationships and that you sections Show that. 
+
+Venkat (07:39)
+Once it is done, number, is there unites are set. Okay, you can Invite subset, so WhatsApp invites are 
+
+Palukuri Karan Dattatreya (Me) (07:51)
+Whatever email, whatever. 
+
+Venkat (07:54)
+Female, whatever are sent to the man. Okay. When the parent downloads using that invite. 
+
+Venkat (08:04)
+Okay, it then River instals. Once their app is installed, it automatically picks it up from the 
+
+Palukuri Karan Dattatreya (Me) (08:18)
+Invite, invite length and at automatically locks them into the gap. 
+
+Venkat (08:22)
+Automatically, so the Child is automatically synchronised. 
+
+Palukuri Karan Dattatreya (Me) (08:32)
+Further, personally, up to the parent 
+
+Venkat (08:35)
+But the school is school is supposed to have perindita. Haha, mobile number 
+
+Palukuri Karan Dattatreya (Me) (08:41)
+Great possibly. 
+
+Venkat (08:44)
+Wherever it is, a failure. Okay, they had been gets a flag saying that composite, saying that this is the list that you said for this class this section. These are the failures mobile number only. 
+
+Venkat (09:03)
+No email, nothing else needs to check mobile number, so we were not able to send an SMS to this numbers, right? This is global law. And so, but if he is not, if he is not updated. 
+
+Venkat (09:24)
+The flag is there. So if the link has happened 
+
+Palukuri Karan Dattatreya (Me) (09:29)
+Then, it should pop-up normally without any error. 
+
+Venkat (09:32)
+Parent is able to see the data. And they just leakage, happen at a teacher also notes that the parent is able to see the data, okay? 
+
+Palukuri Karan Dattatreya (Me) (09:41)
+And also tear visibility on your unnelability, especially educator or the teacher. Ke. Only students data visible count only while Child data visible government. 
+
+Venkat (10:02)
+Early aside. 
+
+Palukuri Karan Dattatreya (Me) (10:05)
+Anything other than what they are. 
+
+Venkat (10:07)
+Hello, this, the Admin also does not have visibility of fields beyond the control fields. Supervised the art idea when you neglect that. 
+
+Palukuri Karan Dattatreya (Me) (10:17)
+Leg, we'll assign them as sub admins. But ghante, we are the true admins. We have control access over everything we don't have access over everything, not everything, essentially, to make changes in any parts of the yeah, we to make us of this. 
+
+Palukuri Karan Dattatreya (Me) (10:35)
+No 
+
+Venkat (10:37)
+We cannot have the. We cannot have access. Once the system is there privacy rules suggest that I even eye cannot draw down any details of the students there. 
+
+Venkat (10:49)
+That is, what encryption means, okay? If I want to get on I have to deal with whatever 36 length I cannot get a Child name without the parents concession without the parents token. That is not the way it works. 
+
+Venkat (11:09)
+They know the level security and ultimately 
+
+Palukuri Karan Dattatreya (Me) (11:11)
+Eventually, yes. 
+
+Venkat (11:15)
+So so from the outside even though I have had been rights, okay, I can get integrated references. 
+
+Palukuri Karan Dattatreya (Me) (11:26)
+Hmm, yeah, that's what you can see the primary data or something. 
+
+Venkat (11:30)
+When you say primary data, I am imagining full name and an agenda that gender and all that that's not what I should, I am saying, basically I need to. I don't need to see the attributes of anybody I only need to see the workflows, alright, so that so when super based is creating those. When so far as I know when it is creating there, I with respect to a Child child ID, any forget 25 stringest, basically in my case, it will only show the functionality of what it has executed every every time I refer to a Child. 
+
+Venkat (12:10)
+Or a doctor or anybody? Okay? So it is only functioning that the advice can see is then he sees Child ID clinician, this one so without consent, which means that I need to know what the ID is. 
+
+Venkat (12:28)
+Then, only I can see limited data. So if somebody comes to me and say, what's the problem man? So there's a problem in my app for the energy level. 
+
+Venkat (12:37)
+So I will ask the doctor what your unique idea is 
+
+Palukuri Karan Dattatreya (Me) (12:42)
+There we can use that unique idea to access the limited data. 
+
+Venkat (12:46)
+Whatever a few data I don't need to call the doctor is still a professional but still Child data. I don't have any right to see the records very much individual record. I cannot see, but overall, if I want to say what is the percentage improvement of people where the parent and the student have downloaded the app? 
+
+Venkat (13:11)
+And both are due together. I can calculate the percentage of math overall, but I can't do it. I can't say this. 
+
+Venkat (13:22)
+This kid has got this much Avenue, you know, that's what the overall security does. Only is special case where the Admin is inviting the 
+
+Palukuri Karan Dattatreya (Me) (13:37)
+That's what I mean. 
+
+Venkat (13:39)
+School administration. 
+
+Palukuri Karan Dattatreya (Me) (13:42)
+School Admin is a principal that we are giving the access. Manufacturer given a Tabu. Namy, I just described the thing and it went to that 
+
+Venkat (13:58)
+My desktop, because it is called the way it works is a revenues of blocker until you solve it. This is just this is the point of discussion. So you make sure that you know that I don't know what Adam is and what manufacture is I understood school at me. 
+
+Palukuri Karan Dattatreya (Me) (14:16)
+Administration. 
+
+Venkat (14:19)
+Why you want? You are a people, you know, you don't need to be role in the supervised. Why you need to be there. 
+
+Palukuri Karan Dattatreya (Me) (14:28)
+Because even accessing the data or entering the unique idea requires its own interface. 
+
+Venkat (14:33)
+Not access to the data Support request question to lessly why you need an adminology. 
+
+Palukuri Karan Dattatreya (Me) (14:46)
+Complicated. Delhi express 
+
+Venkat (14:49)
+Current rate, the if you are identified. 
+
+Palukuri Karan Dattatreya (Me) (14:53)
+The woman closer might be wrong, but 
+
+Venkat (14:55)
+And wondering, why clothe been slappy around left, right and centre, but the rules are literacy. You will have functions and calls to access the E. W database like everybody else alright, because you are the Because you are the owner of the. 
+
+Venkat (15:13)
+You will have certain calls which nobody else will have debugging killer. Understood. So you will make sector you will have certain internal calls, and you'll be able to see the internal Data Structures. 
+
+Venkat (15:30)
+So every time it will be like, there will be a set of rules right by which this entire table is constituted. So for this alarm that the constraints are need, it will be like if this can be modified only if this, and this at this, at this stage a new negat, that Create constraints of New nagara, so those constraints are setting up the rules when you display. So you will also have access to calls, because you know, the rules. 
+
+Venkat (16:03)
+So when you say get XYZ Something with that, it will ultimately this will go on to AW. Yes. It will go and just look at the database and you will give the IDX you will say get this disease diseases and you will get the entire workflows, you will get this stack, correct, because that you don't need to need to know what the teacher's notes are You just have some We'll need to see what it is. 
+
+Venkat (16:39)
+It could just say logs exist. There are 600 characters, some s*** like that. It will Had a logic in the app in the call, so you make a function call it, you see it. 
+
+Venkat (16:52)
+There is no need of an Admin, log, you know. Well, only you will have access to those functions, right? Hello, you? 
+
+Venkat (17:03)
+And will log in 5070 in apps like this. If you have an advin login, you will never get A 
+
+Palukuri Karan Dattatreya (Me) (17:11)
+Privacy policy 
+
+Venkat (17:13)
+You, I mean, what is this privacy policy? You're talking about? There is no privacy policy. 
+
+Venkat (17:20)
+There had been logging that is what many stupid fellows specially as here. But if that is why none of our Hippa woman go, for example, it's a paid feature in supervised you anything to do with children in the US, you have to go with kipa. Okay, India look at DPD 2 privacy laws will be improved, so even these bank apps and all down those. 
+
+Venkat (17:48)
+Buggers will be told, no Admin law itself and local law. They will have to write those calls to access the database exactly the same way, and they will only they can only access the database in regulated kind of mechanisms. You need to have constraints or what can be seen. 
+
+Venkat (18:09)
+And what cannot be seen. So one of the constraints is these fields will always be shown as in Cricket. These fields will never be shown outside. 
+
+Venkat (18:20)
+Sir, share point to the site, content show or not show that meant for privacy, data security. So when you create it, you create it that way, it won't be shown, it's internal stuff. Remove this side manufacturer. 
+
+Venkat (18:42)
+I don't know what role that fellow will have. But. Will being covered later. 
+
+Venkat (18:51)
+Everyone signs up defaulting to parent produce. 
+
+Palukuri Karan Dattatreya (Me) (18:56)
+A roll tables. 
+
+Venkat (18:57)
+How does the user become an educator or a school this? I think is a little bit of a wrong understanding, is not so user will you? How does the user enter this will become an educator? 
+
+Palukuri Karan Dattatreya (Me) (19:22)
+I mean, teacher, a teacher might be like impressed by the app and wants to use it for their own Child. 
+
+Venkat (19:29)
+But that doesn't mean they'll log in. They can have a when the teacher is a part of the school. They are part of the school that relationship is different from the teacher being here. 
+
+Venkat (19:42)
+Part of the app, correct? So teacher, at that time, their longing is parent, but you are saying the same mobile number. 
+
+Palukuri Karan Dattatreya (Me) (19:52)
+Say. 
+
+Venkat (19:53)
+I need to wish you allow you to the mobile number in this school. 
+
+Palukuri Karan Dattatreya (Me) (19:57)
+I didn't define how they would log in in a school environment. 
+
+Venkat (20:02)
+All they would love in a school environment. 
+
+Palukuri Karan Dattatreya (Me) (20:04)
+And they will the submand give credentials, or will it be by the teacher's own personal number or whatever? 
+
+Venkat (20:13)
+There's no mobile number for the school teacher. No, there has to be. It has to be 
+
+Palukuri Karan Dattatreya (Me) (20:18)
+Credentials generated by the 
+
+Venkat (20:20)
+And internally for the school, so it has to be that way. 
+
+Palukuri Karan Dattatreya (Me) (20:27)
+So that answers that 
+
+Venkat (20:29)
+So the teacher may have to enter a particular token number, or something like that, which is you need to let teacher or something like that to log in. 
+
+Palukuri Karan Dattatreya (Me) (20:39)
+Employee, ID something like that instead of like, say phone number, they can enter their employee ID. 
+
+Venkat (20:47)
+So if they do that, then that is that is relevant. So then that automatically solves the teacher being a parent outside. If you don't use the mobile number here. 
+
+Venkat (20:58)
+User Nehru password. 
+
+Palukuri Karan Dattatreya (Me) (21:05)
+Schools, sub environment ki, employee ids have better 
+
+Venkat (21:09)
+That is what I mean, whatever I am saying this really, you generate the total randomly, and make sure that teacher remembers its college. 
+
+Palukuri Karan Dattatreya (Me) (21:17)
+That's all that we can do is 
+
+Venkat (21:20)
+Generate, okay, what you can do is if they forgot the token. It male can go to the administrant. 
+
+Palukuri Karan Dattatreya (Me) (21:27)
+But they can lekin, just go to their principal, or whoever the incharges and they can request the token again. Whatever, because it will be in the system right in their Excel sheet or whatever. 
+
+Venkat (21:46)
+Use the manufacturer. There is no manufacturer to do that for no one. Wait a far now and I will record it in memory. 
+
+Venkat (22:01)
+If you do this that will get impacted. 
+
+Palukuri Karan Dattatreya (Me) (22:05)
+They'll make decisions on its own. 
+
+Venkat (22:07)
+Yes, the parents discovery discovery. Discovery is 
+
+Palukuri Karan Dattatreya (Me) (22:20)
+They're like looking for a special educator on their own. 
+
+Palukuri Karan Dattatreya (Me) (22:32)
+Alexa's system lagaoun. 
+
+Venkat (22:34)
+Currently, layer, we could are, but it's only a special educator it has to be aligned with the fields that the special educator is 
+
+Palukuri Karan Dattatreya (Me) (22:47)
+So it'll be like a search system with skills as the parameters 
+
+Venkat (22:51)
+The skills subjects. 
+
+Palukuri Karan Dattatreya (Me) (23:01)
+Levels. 
+
+Venkat (23:05)
+Ah, thank you for subjects subjects. They may be trying to find my subject, then they'll try to find by distance. 
+
+Palukuri Karan Dattatreya (Me) (23:19)
+Okay, isn't really a parameter with it, but the language with the special educators speak. 
+
+Venkat (23:25)
+Languages language distance is not a parameter distance. 
+
+Palukuri Karan Dattatreya (Me) (23:34)
+If we involve offline aspects into it, then what's the point of the app itself will become more like a glorified urban company for educators? In order could be a possible future thing, but not no. 
+
+Venkat (23:57)
+To use the guy who's the guy like a psychologist? I am not interested in The detailing per session fees from the parent normally teacher. Okay. 
+
+Venkat (24:15)
+The educator only pays subscription fees. Parent only play subscriptions. That is my revenue model. 
+
+Venkat (24:28)
+So if the special educator pay subscription fees for a year and lots of everything is auto pay. And all that right, there's a lot of demands in the app. Until at least they get full eight people or something like that. 
+
+Venkat (24:42)
+Until people The prayer students will grow and grow out of the special educators reach. So for me, it doesn't matter if he is trying to find offline. Also where I have already collected the feast from the subscription, I don't have any intention of Collecting fees after that. 
+
+Venkat (25:06)
+I correct feast for subscription fees for schools, educators, special educators outside the are, you know, they just pay subscriptions and drive the app. Okay, and so then they'll be able to advertise their portfolio and all that. So I've already collected the fees, I don't need anything, so it doesn't matter. 
+
+Venkat (25:31)
+So you have distance, because sometimes they may say, Bhaiyya, Yampa gulpit out. No, you never know it. 
+
+Palukuri Karan Dattatreya (Me) (25:41)
+That's 
+
+Venkat (25:42)
+Model you want it to leave it to them, to suggest basically, if the online session is working. Great. If the online session is not working either this guy goes to that guy's house, or that guy comes to this guy's house. 
+
+Venkat (25:56)
+Whatever it is, whatever is the agreement they do or they go to commonplace or something like that? It is fine. So yes, it is, it does become a truition facilitator. 
+
+Palukuri Karan Dattatreya (Me) (26:11)
+In some way. 
+
+Venkat (26:15)
+Okay, now the point is So I don't mind it, getting corrupted in a sense that, oh, this is not. This is a special education. Anything let them use their own materials I want. 
+
+Venkat (26:29)
+I want the I want Subsidies, I want magguel equal to join app. Because the genuine fellows will use the genuine applications Okay. 
+
+Palukuri Karan Dattatreya (Me) (26:44)
+The people who are looking for a tuition teacher or whatever the list, the one time subscription fee find the teacher that they want and go. 
+
+Venkat (26:53)
+Yeah, that's what you've dare on that. That's all fine. They can continue to be on that. 
+
+Venkat (27:00)
+There are reasons they want to be continue to be on the app. It's not a problem. It's like skill assessment, you know, all that stuff, though. 
+
+Venkat (27:08)
+So for example, if they want to assess the skills against NCS, depending and all that they will do that, if they want to say all this is useful, because, you know, it's like If the children are dancing The parents can track the improvement in the Child rather than just saying a teacher told this special we told this in all they can keep periodically tracking the improvement, the gaps will reduce for the period so that's why it is there, so we are telling the 15 events earlier yeah. So, whether he goes to online or flair fallana tinkar, he comes here, he gets it, he gets itself all that is free. 
+
+Venkat (28:03)
+You can go subscription, open karo 25000 times you can do assist it. 
+
+Palukuri Karan Dattatreya (Me) (28:11)
+And would we be taking the chore to serve percentage free? 
+
+Venkat (28:16)
+Possible? 
+
+Palukuri Karan Dattatreya (Me) (28:19)
+If a parent subscribes to a special educators at the home plan or whatever. 
+
+Venkat (28:24)
+Save the subscription, you don't want to always find that free. And all the sides tell you why the razor play logic will become far simpler. With the subscription, you don't need anything function, calls it created to wound out, then you don't have the problem of you know, scheduling things. 
+
+Venkat (28:47)
+And you know, let it calculation when we, that's not your problem, that's the problem of the parent at the educator. Special educator okay. How whether the parent paced, a special educator another fees or anything of that sort all we are saying is we are giving the facility. 
+
+Venkat (29:11)
+Take base after the class before the class, 5 classes together, 25 classes. Later. That's up to the Education has the option to basically disengage with the Child suspect with the Child. 
+
+Venkat (29:26)
+If the parent has not paid, for example, and you leave it at that And they are that Right? So if the guy is not great, just the especially educator suspects. So in this suspending the Child, I'm sure basically you need to send a notification to the village. 
+
+Venkat (29:49)
+Since this is suspending the Child the without, they have to select the reason they are suspending this Child. 
+
+Palukuri Karan Dattatreya (Me) (29:57)
+Why are you suspending the study? And that reason goes to that 
+
+Venkat (30:01)
+Hey, so it has to be what school please. The Bagal is the news. Whatever it is, I mean, if the guy is willing to prove it No. 
+
+Venkat (30:22)
+It gave me that the guy and the teacher is moving on in life that he's going from one place to another place. Too much. If we are already substitution, a lot of things, assuming that we are going to take fees percent. 
+
+Venkat (30:56)
+I think that's Merchant, public or do 
+
+Palukuri Karan Dattatreya (Me) (31:10)
+What modes of communication? Will we be using for notifications for modes of communication? Login, how do we communicate apple interview? 
+
+Palukuri Karan Dattatreya (Me) (31:24)
+So in app notifications, push banner notifications until 
+
+Venkat (31:29)
+What is what are you going to do thinking about? 
+
+Palukuri Karan Dattatreya (Me) (31:37)
+It's payment transformations or upcoming payments autopy. Because we do have to legally need to, you know, notify the parents at their autopilot thing coming 
+
+Venkat (31:52)
+Auto Priya. To be suggested, just the water, please suggest really. You have to be seen. 
+
+Venkat (32:02)
+Auto pressure just come to process. I think the result takes care of it. You're like a it's that you get to post cloud to Delhi. 
+
+Venkat (32:17)
+It's just a black box. 
+
+Palukuri Karan Dattatreya (Me) (32:18)
+Yeah, but like when I was looking up these things, it was one of the things that I noticed that you like, basically look quiet to, you know, notify the party that you will be. 
+
+Venkat (32:28)
+Note that that's what I'm saying is all that legality aspect of it. The API takes care of so it will so it will take care of all those aspects. So in a sense that it has to notify all the 
+
+Palukuri Karan Dattatreya (Me) (32:41)
+That's the same thing I noticed in the razor pay FAQ so I was confused if razor pay will do it, or are we supposed to notify as well? 
+
+Venkat (32:53)
+What I understand there is a way we will do it, but let us see. I think we can customise the message or something that When you help UHealth module. So UPI helps 
+
+Palukuri Karan Dattatreya (Me) (33:12)
+So subscription confirmations, subscription confirmations. 
+
+Venkat (33:18)
+It 
+
+Palukuri Karan Dattatreya (Me) (33:19)
+Click when a parent subscribes to a educator. Are details because most of The Times those details are sent via mail. 
+
+Venkat (33:31)
+Cross. 
+
+Palukuri Karan Dattatreya (Me) (33:32)
+Class details a class schedule other than the app. 
+
+Venkat (33:36)
+So there will be a calendar, right? If there is a calendar Okay, your notification has to be a reminder that such in such class section is happening tomorrow or something like that. So you have the so you have the calendar and there are certain functions which are playing Always in the background. 
+
+Venkat (34:01)
+My medication is one of them. Sorry, calendar. 
+
+Palukuri Karan Dattatreya (Me) (34:09)
+Okay, and the calendar ki regarding meal. Question lecture. 
+
+Venkat (34:16)
+Until I am going to constructive, supervised slow so wherever, whenever the now is goes to that calendar, you have to say basically make sure that the nouns are all you know, need the Some flags are set Remind 24 hours before remind 12 hours before remind 6 hours before. 
+
+Palukuri Karan Dattatreya (Me) (34:44)
+Individuals in the SMS Ooty PC so what now the OTP system works like us? Supervised? Uh generates the OTP it has MSG to convey it to the customer or user. 
+
+Palukuri Karan Dattatreya (Me) (35:05)
+It gets the OTP back through user input. It verifies it in superbase, so MS GIS only the carrier. It doesn't generate ODP nor verify it. 
+
+Venkat (35:16)
+So I think what happens when you ask 
+
+Palukuri Karan Dattatreya (Me) (35:22)
+The entire code will also migrate, so even these web hooks these are like not super based integrated web books. These are just web books, which have super based UI built into them. So the basic code can be transported to AWS as well. 
+
+Palukuri Karan Dattatreya (Me) (35:41)
+Because super, based, when we are truly going, large-scale is not viable. So I made sure that 
+
+Venkat (35:54)
+I was not just any next 
+
+Palukuri Karan Dattatreya (Me) (36:04)
+Starting sector. 
+
+Venkat (36:05)
+Trained educators answered. Do parents book a package offering or individual sessions? They have booked up? 
+
+Venkat (36:12)
+Both are accessible? Okay, so it depends on what the guy has allocated. Simply Put a package is X number of sessions continuously together. 
+
+Venkat (36:25)
+3 months right, so all that fellow gets is received, so suppose it says 3 months, three weeks, so that the guy gets to define the way his packages said. What are the features of the package packages subject name, how many sessions 
+
+Palukuri Karan Dattatreya (Me) (36:43)
+An individual sessions, and what's a discount? Parvik, the number of sessions with the educator decide when the sessions will be 
+
+Venkat (37:04)
+Cancellation refund rescuitive, policy and motion handling 
+
+Palukuri Karan Dattatreya (Me) (37:08)
+Umbi, will we carry our razor pace policies, or are we going to make the room More refunds land today, but if we want, we can add a 24 hour rule, or 18 hour rule or something like that. Refundable, things. 
+
+Venkat (37:35)
+Mummy. Your typical session length and is recording allows stored soon. Soon? 
+
+Palukuri Karan Dattatreya (Me) (37:50)
+The next thing you could block our step saint. 
+
+Venkat (37:55)
+Recording store Jaya. 
+
+Palukuri Karan Dattatreya (Me) (37:59)
+Because if we are, we are to store that recording, it will require huge amounts of service base. And additional cost in encryption 
+
+Venkat (38:13)
+Then, record onto the disc. 
+
+Palukuri Karan Dattatreya (Me) (38:15)
+Personal recording. 
+
+Venkat (38:20)
+The rule needs to be called on to the disc. It's a copy, it's a distri. 
+
+Palukuri Karan Dattatreya (Me) (38:24)
+So educator can't record 
+
+Venkat (38:26)
+Educator what we bought, why does educator need to record it? 
+
+Palukuri Karan Dattatreya (Me) (38:32)
+I don't know personal reference of each teaching methods. Maybe you want to view himself in third person I don't know his own needs. 
+
+Venkat (38:47)
+In order to use heart discount 
+
+Palukuri Karan Dattatreya (Me) (38:49)
+But privacy council still be still remaining 
+
+Venkat (38:51)
+Yeah, the new records. Teams call laws. 
+
+Palukuri Karan Dattatreya (Me) (39:02)
+This session is being recorded some audio to you like that. 
+
+Venkat (39:06)
+Yeah, this session is being recorded. And they can object 
+
+Palukuri Karan Dattatreya (Me) (39:10)
+Okay so a prompt, instead of an audio 
+
+Venkat (39:13)
+Example TV teams on the vital that I am recording any recording transcriptory recording Transcript transcript recording was solid, so people are recording Transcript. The video. 
+
+Palukuri Karan Dattatreya (Me) (39:28)
+But in this case, what if the guy wants video itself? Because the sessions in this case don't essentially dependently on voice communication, visual So let's say if the Child is drawing something. And if the educator is seeing 
+
+Venkat (39:50)
+Special educative modules if they use it 
+
+Palukuri Karan Dattatreya (Me) (39:54)
+Still scenario? So should he able? Should he be able to record it or not? 
+
+Venkat (40:07)
+He records it. Your question is, should we store it or not? Story? 
+
+Venkat (40:12)
+Turns, very discording, is done with consent. Always, it is done with consent. It is not done without consent. 
+
+Venkat (40:21)
+I can stop a recording at any point of time. Okay? So Let the guys say every time, even that phone guys say, now, this call is recorded for people. 
+
+Palukuri Karan Dattatreya (Me) (40:37)
+Not the Indian ones, but yes. 
+
+Venkat (40:38)
+Build a lot of people say that I know what they do with that. But yeah, lot of things happen lot of things whatever recording it's on the distance. 
+
+Palukuri Karan Dattatreya (Me) (40:49)
+And all we are doing from our end is just sending the prompt If they consent to it or not. 
+
+Venkat (40:59)
+Plan to student today. 
+
+Palukuri Karan Dattatreya (Me) (41:05)
+That's a thing, it's a factor ki. Because not every time the parent will be supervising, the call right? This future may, if we are, if we are to present this to anyone, they might ask the same thing. 
+
+Palukuri Karan Dattatreya (Me) (41:25)
+How are you thinking that a Child is Knowledgeable enough for moiture, enough to handle such consents. 
+
+Venkat (41:36)
+It stood me that 
+
+Palukuri Karan Dattatreya (Me) (41:43)
+So for now, we'll pause this feature, we can think about it, and later deploy it. 
+
+Venkat (41:57)
+We handled this can one per person, hold multiple goals and all that no And lives, especially on outside special educator wants to add their own Child and wants to coach them. Coach him on the session that will be only true if there is some incentive attached to it. Does need to manage Yes 10 user manufacture role internal butter only. 
+
+Venkat (42:40)
+Multiple children per parent, of course. Is the every Child is unique? So every Child so they are 2 parents can have 2 Child profiles. 
+
+Venkat (42:55)
+A Child ID is unique. 
+
+Venkat (43:09)
+Han private educators marketplace token economy define the token. And what do tokens buy nothing but we'll set subscription. 
+
+Palukuri Karan Dattatreya (Me) (43:19)
+That's what it means. Weight opens for some reason, it no upwork. Example, it means, you know, I need tokens, kund. 
+
+Venkat (43:32)
+This app will be based on substitutions. 
+
+Palukuri Karan Dattatreya (Me) (43:34)
+So you pay the subscription, your allowed AC 
+
+Venkat (43:38)
+Yeah, by parenting, by default, they will have few free ones. But so it depends on what we want to do free, and what we don't want to do free or whatever, but they will have a lot of Root. So the special executive laws in and the parent they don't get access to functionalities, like, you know. 
+
+Palukuri Karan Dattatreya (Me) (44:12)
+Children, data access or children names. 
+
+Venkat (44:16)
+Haha, did not know? Yeah, especially educated in log as a place, no problem. 
+
+Palukuri Karan Dattatreya (Me) (44:23)
+But as a different profile, as a different profile 
+
+Venkat (44:27)
+Hi, it is XM mobile number different period as a parent. As A 
+
+Palukuri Karan Dattatreya (Me) (44:33)
+Or we can include this in the log in details, right? 
+
+Venkat (44:37)
+Now, the special educator is also appearing. Why does he leave the app to do all this? He only needs the app. 
+
+Venkat (44:50)
+To do the testing, I think, other challenges He's not going to schedule sessions with himself. Replace subscription on both sides. 
+
+Palukuri Karan Dattatreya (Me) (45:05)
+I mean, we would be happy feeded, but yes 
+
+Venkat (45:10)
+I tend a but special educator does not need a parent profile to specificate the instant. He can add a Child on his own. Yes, that's okay. 
+
+Palukuri Karan Dattatreya (Me) (45:31)
+Ok.

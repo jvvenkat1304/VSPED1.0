@@ -1,0 +1,313 @@
+Educator verification and platform setup for special education services
+
+Palukuri Karan Dattatreya (Me) (00:07)
+Okay, credit cell verification, special educators and other people. People who are going to offer their services while credentials on Mella verifiers. 
+
+Venkat (00:19)
+So special educators. It depends on depends upon the type of chill Child. So if you are exposing Child to this framework, then special educators, if they claim NRC I verification RCI certificate, you can verify it on the portal, there is a specified portal for R. 
+
+Venkat (00:44)
+C. I. It's a simple checked on the website query the website, it will tell you whether that person exists or not based on that number. 
+
+Venkat (00:56)
+For others where you are talking about, say tuitions, kind of the special, somebody who is Especially, good to educate on They are, you would expect them to have made certificates or something of that sort But nevertheless, it is not uncommon for private children and secondary great children to be taught by people without being it. Great, so So the question is, then do we limit telling that, do we do? We limit tell education only to, for neurodivergent, children. 
+
+Venkat (01:38)
+Or do you want to expose it for anyone? Hell everyone. 
+
+Palukuri Karan Dattatreya (Me) (01:48)
+See what I believe is the RC. A certified individual, so are going to be offering their services for neurodivergent, children should be isolated. 
+
+Venkat (01:56)
+Should. 
+
+Palukuri Karan Dattatreya (Me) (01:57)
+Isolated sea. 
+
+Venkat (01:58)
+Isolated. 
+
+Palukuri Karan Dattatreya (Me) (01:59)
+So if parents looking for casual intuition, sort of thing. They should verify it, we have 2 options to go by this we eit. The parents have to believe whatever the educator is putting up on their profiles and after later verify according to their own 
+
+Venkat (02:15)
+Use the inside, they give you a valid R CS certain number. It will be I would certain that it will be validated to the website. 
+
+Palukuri Karan Dattatreya (Me) (02:24)
+No obviously is the easy part over here. How do we confirm the bed? And all these other things? 
+
+Venkat (02:30)
+Let them basically expose their credentials, and if they are charging your fees and they want to I want to avoid that totally 
+
+Palukuri Karan Dattatreya (Me) (02:40)
+So because it can also be bad. 
+
+Venkat (02:42)
+Do one thing, let's get the RCI certified. Only the special education being certain isolated, because that's for the Tele. Sessions, the links to the neurobridge. 
+
+Venkat (02:55)
+It's a common database, so we will be able to see The respect database will also see the neurospect neuro bridge database. And whoever are the children's who are potentials for that for special education can be offered. We spent okay, so that's an extension. 
+
+Venkat (03:16)
+So for the for the neurotypical children, let's keep it limited as a B2B or AB2C within the framework of the games itself. Okay, we can will park the Whether there are lots of websites that there are lots of people that are who are doing online tutions or revenue on that sort. So we don't want to, we don't want to compete in that space, let them learn on their own. 
+
+Venkat (03:48)
+That's fine. You're not using the games, and also they may learn something different or whatever. Games are more enough. 
+
+Palukuri Karan Dattatreya (Me) (03:59)
+But there's also another problem. The amount of people who could sign up on the app parents. For example, how do we ensure that there is an equal appropriate number of R CS people? 
+
+Venkat (04:11)
+What's the reason why that is a that is a question of Marketing and president. So Aren't you make the sign of free then? That's perfectly fine? 
+
+Venkat (04:31)
+That's one way if but we are having a networking, or we are saying that But each other goal is to have B2C then 2B. Yes, right. So it's either B2C to B or B2B 2C. 
+
+Venkat (04:47)
+These are the 2 options, yes, so B2C where the parent directly is. We are asking the question the parent directly like, you know, we'll do a still for your Child, right? Depending on class levels and all their stuff. 
+
+Venkat (05:04)
+So that's the advertising, so they go through, it's a gamified thing so obviously they check their skill assessment and we have done okay. Then, for the schools, and so so that's one way of getting the parents earn, and then they can do more, they can learn about maths and English throughout their English language. From first to 50 grade, we will have it initially then comes the next one, which is the V-2 V2B2C. 
+
+Venkat (05:39)
+That is the schools team? Which is, I think, which is substitution based and all that inside the class. And all right, so we'll take that, because that I think requires a little bit more investment than what we think, because you will have to give chaos devices, and all that. 
+
+Venkat (05:57)
+So initially, let us target B to see. And then we'll see we do 
+
+Palukuri Karan Dattatreya (Me) (06:02)
+So for the primary versions, we'll focus on B to C aspect of the model. 
+
+Venkat (06:08)
+2000 years, the first version of the app that goes will be 
+
+Palukuri Karan Dattatreya (Me) (06:17)
+Hello, the second part of this question. You see second part, second question would be educator availability mechanism. The calendar slots, how do we ensure that the slots? 
+
+Palukuri Karan Dattatreya (Me) (06:31)
+The still educator is setting on their profile is being reflected accurately on the parents because is a small gap because the special educator safe, we make this app. Global and the special educators calendar profiles are different. 
+
+Venkat (06:52)
+So so either there are 2 ways the way I have done it. For river breach, the special educator is responsible for proposing the time and honouring. Okay, so you've got the specific proposes, the time or a stakeholders, right? 
+
+Venkat (07:10)
+And within the app itself. You can create schemas that the log in these sessions. Okay, and we should be able to directly tell the parent that up They accept and then move on right, I'm expecting that a lot of people will discuss these things on the phone, right? 
+
+Venkat (07:40)
+So whatever they come up with will be Will be set in stone okay, where the where it radiation will happen is if the special giant is charging per sessions on and so forth, either said we should not get into the payment mechanics of it voluntarily. Alright, we should just be able to make sure that our time let the special educator and the parent handle the payment outside. 
+
+Palukuri Karan Dattatreya (Me) (08:09)
+But it still advisable to set up at least a standard for the payment schemes. Because it should not be so that we are just offering the platform and we are leaving the rest of the bar to the educators to do what they wish with the platform just because they paid a certain amount of subscription. 
+
+Venkat (08:26)
+What will they do with the platform? 
+
+Palukuri Karan Dattatreya (Me) (08:28)
+Let's say if they are charging enormous prices, and they send all of us in this inflation. They drive away the people who are coming out to supply 
+
+Venkat (08:41)
+Target free, if somebody saying somebody is saying that I'm going to charge 5000 per session, they better we work 5000 we must price is a very big signal. It's an economic signal. If they are judging way above what they value, what their valued rate automatically, people will reject. 
+
+Venkat (09:03)
+So it's a let's not get into administrative pricing. We are not the Government. 
+
+Palukuri Karan Dattatreya (Me) (09:17)
+And for the subscription tears themselves. How exactly you will they PAN out and what said, billing cycles? Subscription pricing, tears and billing cycles. 
+
+Venkat (09:41)
+I don't think that's a big challenge. If you have both options. Subscriptions are for the I'm seeing 
+
+Palukuri Karan Dattatreya (Me) (09:56)
+The parents will have a free to sign up version of the app. The therapist will be the ones who will be paying the subscribers. 
+
+Venkat (10:03)
+Strategy, as well as the country 
+
+Palukuri Karan Dattatreya (Me) (10:06)
+And I asked this question already for the games, we are keeping it as a separate module for changes in etc. I didn't understand what the worry meant by this but GST, tax or invoice requirements. 
+
+Venkat (10:21)
+Yeah, so let's see how it's renewable system comes out. Then, you will have a GST ID coming state, okay, in the B2 case it is not required. I mean, he is required in the sense that you have to collect GST, I suspect, 18% GST, so letters K confirm and let them 
+
+Palukuri Karan Dattatreya (Me) (10:50)
+And I confirm this with Avatar. 
+
+Venkat (10:51)
+Well, another thing, startups have startups get an exemption on income tax, not on waste. Ah 
+
+Palukuri Karan Dattatreya (Me) (11:07)
+So I discussed with this curve, what she was saying was me Founder to the co-founder founder. So the ratio will be from 1:1 to 1:4 or will it be 1:1 to whatever the educator sets 
+
+Venkat (11:31)
+I mean, 1 is 4 obviously they will set the price in a way where it is cheaper apers cheaper. Okay, but this is because this is meant only for special educators. Special education You can have unease to 4. 
+
+Venkat (11:49)
+In fact, you should, if you, I am assuming that you will keep control over the number of people who can join procession, right? If you Believe it. If you leave it to them. 
+
+Venkat (12:08)
+They will. There will be a lot of issues But if you don't leave it to them, there will be a lot of complaints. 
+
+Palukuri Karan Dattatreya (Me) (12:16)
+From them, so we have to find a sweet spot where they are not exactly 
+
+Venkat (12:21)
+The best way is to basically allow freedom for all you do not need to control, let the technology control right? 
+
+Palukuri Karan Dattatreya (Me) (12:28)
+I heard, but it'll drive the costs up because the video SDK or whatever platform that we end up choosing for this video calls, these will charge birth participant and per data being transmitted and received just because they are giving us a small portion of that subscription B doesn't mean we are going to be paying twice as more and video cost. 
+
+Venkat (12:53)
+That is that amongst the calculation of the subscription, okay so if they are going to basically you can have years in the subscription fee if they would have 12 only 1 × 1. And then if they want 1:8 calls, you could say that you could say that Depending upon the type of calls, you could add charge and incremental fee at that point of time. Just make sure that they know it at that time. 
+
+Venkat (13:26)
+Right? So if you are going to have 6 months of sessions which one education we will charge you an incremental preparation or something like that and then do that and move on. I don't deal with that much work. 
+
+Palukuri Karan Dattatreya (Me) (13:41)
+You never know, it's better to be safe and is there any 
+
+Venkat (13:44)
+In this view of a value billing rates for videos E and value. 
+
+Palukuri Karan Dattatreya (Me) (13:50)
+Because video SD case billing rates to grow exponentially, the smaller the number. The billing rates are relatively smaller, but as the number grows, like, say 9% or 12 participants in a call prices start doubling tripping, and all And is there any specific email provider, or we continue with M? Yes? 
+
+Palukuri Karan Dattatreya (Me) (14:10)
+G? For tax invoices or receipts or something, we need an email provider. We need an email provider as well, because say, if we are to make this global not everyone 
+
+Venkat (14:26)
+Do that for you EWS can do that for you. 
+
+Palukuri Karan Dattatreya (Me) (14:29)
+That's why is there any specific event 
+
+Venkat (14:38)
+So the email provider is usually I'm going to be the 8 of sponsor because all of this data supervised does not have the capacity to manage, they don't have gues, and all that 
+
+Palukuri Karan Dattatreya (Me) (14:49)
+Didn't do, but it's limited. 
+
+Venkat (14:51)
+So you ideally want to basically set this up on. Supervised will be the RL Sn on that, but the server is funded and bracket will be running on Amazon right? Of course, we went back so I Am running the front of Europe region Amazon. 
+
+Venkat (15:08)
+So and as far as this is super basic WhatsApp. So 
+
+Palukuri Karan Dattatreya (Me) (15:16)
+And the last one can be handled later. 
+
+Venkat (15:19)
+What is that? 
+
+Palukuri Karan Dattatreya (Me) (15:21)
+Policies. 
+
+Venkat (15:24)
+So here you what we need to what we what you need to tell Claude, is that we want to ensure we are in complete compliance with what is called DPD PC triver. So what that we'll do is it will start imposing restrictions on rls, there will be policies that will be created alright for the special educators to right, then the code will also be detected in that particular way, right so For example. If you, if only a parent can suppose there is some evaluation or something that goes on, right? 
+
+Venkat (16:06)
+Only a parent can see the 
+
+Palukuri Karan Dattatreya (Me) (16:10)
+Results of that evaluation unless it's shared 
+
+Venkat (16:14)
+Sure. Yeah, unless they consent to share it with somebody else, you cannot see it yourself. Okay, so so that will be the policy, right? 
+
+Venkat (16:23)
+But what you should be able to do is you should be able to see the data in the aggregate. Okay, so that means that some of these supervise, the way the supervised policies will be written is that Some of these values okay, will only be Enumerated, if certain conditions are Lin. 
+
+Palukuri Karan Dattatreya (Me) (16:52)
+In 
+
+Venkat (16:53)
+Ready as a policy, right? So if I am doing aggregation, then only releases data, otherwise. Don't release this data individually against the so there will be the Indian right? 
+
+Venkat (17:06)
+Start rating all the policies, depending upon what you said or said he said. But so having it as a guideline So GPT, we right, because these are children, right? 
+
+Palukuri Karan Dattatreya (Me) (17:23)
+And I wanted to ask you if you could form the policies and then upload it to get her push together. And I'll can pull from here, the policies you would draft it yourself. You drafted from your end because the RLS policies that we have right now in super based, do not have these data attention and data. 
+
+Venkat (17:44)
+He should snort that complicated. It actually, the point is, the policies say, for example, for Euro bridge are much more tightly bound because it is healthcare. Yes, you may not require all that for 
+
+Palukuri Karan Dattatreya (Me) (18:00)
+Yes, but then again we are using these games as an assessment. Aren't we? Using these games as an assessment? 
+
+Venkat (18:06)
+However, yeah, the point is, you know, the way the policies are. I don't know what you have named your table, so right, so it's better to tell Call set the policy you set the policy complaint to DPD so then it will generate an XQL file for you to just do supervised push and the policies policy help update and then verify whether it will tell you so first it will say Mr. ID all these things to start getting said and say, what kind of queries can be done on this database? 
+
+Venkat (18:45)
+All those things, it will write a very big file for you but it is usually accurate. They don't miss anything. And then so always do one thing because there are going to be policies, etc. 
+
+Venkat (18:58)
+Ask God to write regulation tests. Okay. I have a separate decreasion test directly so that you know a lot of conditions can be pre verified and whenever the code has been written for that. 
+
+Venkat (19:13)
+Okay, so let us say for example, you are you don't want the tool to give you Ram statas to a terrorist consent of the merit right? So in that case, what happens is You should be able to be done, but the parent may have given consent at some point of time. 
+
+Palukuri Karan Dattatreya (Me) (19:46)
+For the session, yeah, there's an expiry 
+
+Venkat (19:55)
+Get translated. I am saying the policy will right like if nobody can see Ram's data without consent. Informed consent service right now. 
+
+Venkat (20:06)
+Parents may have given concept assuming it's only for concession. So Every time the parent that's the belief that case then this fellow has Now that once, but you have written the rules in it way that consent is not revoked until there is revoking unset. Okay, so concern button. 
+
+Venkat (20:39)
+Now that may mean that you may that may mean that that's all can basically keep downloading all these reports and showcasing as his advertising kids look how I transferred the translated, the student and all that all right, I need to get 10 marks now. He gets 30 marks that kind of ship they will do. He must give space for it, but then we will Put it in Instagram and all that the parent may come back to you and school yours. 
+
+Venkat (21:10)
+So in that sense, what has been done is It has to be very clear that the how long it lasts a parent has to be very clear right, you cannot. You may want to revoke, give consent for a section only or you want the next fairly day, every clear I don't need to give all the options to the parents. Okay, so you could give term based kind of things. 
+
+Venkat (21:41)
+So so special education can set a session for 6 months. The consent is on only for 6 months. The special educator cannot download any data. 
+
+Palukuri Karan Dattatreya (Me) (21:53)
+They can view the derivative. 
+
+Venkat (21:56)
+The point is, they cannot do. They need not know past session marks and all that stuff in a very in a very direct manner. Okay, so whatever you post out You would postpone that or something like that. 
+
+Venkat (22:12)
+It's the rules of a lot of things only if the parent consists For let's go so get extracting data for an advertisement is like giving rating right? The special education men asked for that rating. You can ask your parent and if the parent is genuinely interested, they can give the consent. 
+
+Venkat (22:36)
+And we will give the data in the format in some format that he accepted without giving the Child's name, there could be some policies around. Hey, nobody can take a SnapShot of the screen when the session is going that these idiots will, they will do that. So So those kind of things may come out, which will be very unique to teaching. 
+
+Venkat (23:03)
+My case, it will be very neurology will be very different. Situations are different, right? I don't want clinicians, for example, are very busy people. 
+
+Venkat (23:20)
+They don't want to be asking their parents consult every day, so I will have to make the consent and link the parents responsibility, and I will write messages to that effect. Great. This clinician has this consent. 
+
+Palukuri Karan Dattatreya (Me) (23:33)
+Reminders. 
+
+Venkat (23:35)
+No, every time it will be there. 
+
+Palukuri Karan Dattatreya (Me) (23:37)
+So are every time a charge 
+
+Venkat (23:40)
+Yeah, yeah, so we see every time under the Child window itself, people who can view this at this child's data XYZ. Doctors with the revoke access 
+
+Palukuri Karan Dattatreya (Me) (23:52)
+Snapchat as a similar feature 
+
+Venkat (23:55)
+So that depends on what you wanted. So the PDP Mali, so the educators will use for advertising right doctors are not going to use it like that. 
+
+Palukuri Karan Dattatreya (Me) (24:07)
+Personal reference, probably, but there's no point in them. 
+
+Venkat (24:10)
+Yeah, so you don't need to build for all and you just need to make sure that so it could become different things so different. So, that's why you have to think about the scenarios, so you, I have thought about the scenarios you go won't think about the scenarios for you. 
+
+Palukuri Karan Dattatreya (Me) (24:31)
+Bangalore, I got it. 
+
+Venkat (24:35)
+What I expect you to do is you have to think about how what the business will run, how it will run. You cannot say are you? I mean it cannot come back to me saying I did not say I did not say it so therefore this is why I did not do it. That's all about you. Deliberate about it, research about it.
