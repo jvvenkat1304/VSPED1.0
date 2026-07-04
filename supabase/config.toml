@@ -48,3 +48,33 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/send-sms-hook/deno.json"
 entrypoint = "./functions/send-sms-hook/index.ts"
+
+[functions.create-child]
+enabled = true
+verify_jwt = false
+import_map = "./functions/create-child/deno.json"
+entrypoint = "./functions/create-child/index.ts"
+
+[functions.get-child]
+enabled = true
+verify_jwt = false
+import_map = "./functions/get-child/deno.json"
+entrypoint = "./functions/get-child/index.ts"
+
+[functions.request-consent]
+enabled = true
+verify_jwt = false
+import_map = "./functions/request-consent/deno.json"
+entrypoint = "./functions/request-consent/index.ts"
+
+[functions.respond-consent]
+enabled = true
+verify_jwt = false
+import_map = "./functions/respond-consent/deno.json"
+entrypoint = "./functions/respond-consent/index.ts"
+
+[functions.revoke-consent]
+enabled = true
+verify_jwt = false
+import_map = "./functions/revoke-consent/deno.json"
+entrypoint = "./functions/revoke-consent/index.ts"

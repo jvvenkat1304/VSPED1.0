@@ -9,24 +9,47 @@
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
--- 1. CHILDREN table (if not exists) — central child identity
+-- 1. CHILDREN table — central child identity
+-- If the table already exists (from prior migrations), add missing columns.
+-- If it doesn't exist, create it fresh.
 -- ---------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.children (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  parent_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  
-  -- Encrypted PII fields (stored as encrypted text; decrypted only in-app for parent)
-  encrypted_name TEXT NOT NULL,           -- AES-256 encrypted child name
-  encrypted_dob TEXT,                      -- AES-256 encrypted date of birth
-  encrypted_gender TEXT,                   -- AES-256 encrypted gender
-  
-  -- Non-sensitive metadata (visible to system for routing, not PII)
-  child_uuid_public TEXT NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),  -- opaque reference ID shared externally
-  
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  deleted_at TIMESTAMPTZ DEFAULT NULL      -- soft delete for right-to-erasure
-);
+DO $$
+BEGIN
+  -- Create table if it doesn't exist at all
+  IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'children') THEN
+    CREATE TABLE public.children (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      parent_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+      encrypted_name TEXT NOT NULL,
+      encrypted_dob TEXT,
+      encrypted_gender TEXT,
+      child_uuid_public TEXT NOT NULL DEFAULT encode(gen_random_bytes(16), 'hex'),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      deleted_at TIMESTAMPTZ DEFAULT NULL
+    );
+  ELSE
+    -- Table exists; ensure our required columns are present
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='encrypted_name') THEN
+      ALTER TABLE public.children ADD COLUMN encrypted_name TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='encrypted_dob') THEN
+      ALTER TABLE public.children ADD COLUMN encrypted_dob TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='encrypted_gender') THEN
+      ALTER TABLE public.children ADD COLUMN encrypted_gender TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='child_uuid_public') THEN
+      ALTER TABLE public.children ADD COLUMN child_uuid_public TEXT DEFAULT encode(gen_random_bytes(16), 'hex');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='deleted_at') THEN
+      ALTER TABLE public.children ADD COLUMN deleted_at TIMESTAMPTZ DEFAULT NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='children' AND column_name='parent_id') THEN
+      ALTER TABLE public.children ADD COLUMN parent_id UUID REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+  END IF;
+END $$;
 
 -- Index for parent lookups
 CREATE INDEX IF NOT EXISTS idx_children_parent_id ON public.children(parent_id);
@@ -154,15 +177,21 @@ $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
 -- === CHILDREN table ===
 ALTER TABLE public.children ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if re-running
+DROP POLICY IF EXISTS children_parent_select ON public.children;
+DROP POLICY IF EXISTS children_parent_insert ON public.children;
+DROP POLICY IF EXISTS children_parent_update ON public.children;
+DROP POLICY IF EXISTS children_grantee_select ON public.children;
+
 -- Parents can see/manage only their own children
 CREATE POLICY children_parent_select ON public.children
-  FOR SELECT USING (parent_id = auth.uid() AND deleted_at IS NULL);
+  FOR SELECT USING (parent_id = auth.uid());
 
 CREATE POLICY children_parent_insert ON public.children
   FOR INSERT WITH CHECK (parent_id = auth.uid());
 
 CREATE POLICY children_parent_update ON public.children
-  FOR UPDATE USING (parent_id = auth.uid() AND deleted_at IS NULL);
+  FOR UPDATE USING (parent_id = auth.uid());
 
 -- Grantees can see children ONLY if they have active consent (and only non-PII unless scope includes it)
 CREATE POLICY children_grantee_select ON public.children
@@ -175,6 +204,11 @@ CREATE POLICY children_grantee_select ON public.children
 
 -- === CONSENT_REQUESTS table ===
 ALTER TABLE public.consent_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS consent_req_requester_insert ON public.consent_requests;
+DROP POLICY IF EXISTS consent_req_requester_select ON public.consent_requests;
+DROP POLICY IF EXISTS consent_req_parent_select ON public.consent_requests;
+DROP POLICY IF EXISTS consent_req_parent_update ON public.consent_requests;
 
 -- Requesters can create requests and see their own
 CREATE POLICY consent_req_requester_insert ON public.consent_requests
@@ -193,6 +227,10 @@ CREATE POLICY consent_req_parent_update ON public.consent_requests
 -- === CONSENT_GRANTS table ===
 ALTER TABLE public.consent_grants ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS consent_grants_parent_select ON public.consent_grants;
+DROP POLICY IF EXISTS consent_grants_parent_revoke ON public.consent_grants;
+DROP POLICY IF EXISTS consent_grants_grantee_select ON public.consent_grants;
+
 -- Parents can see all grants for their children
 CREATE POLICY consent_grants_parent_select ON public.consent_grants
   FOR SELECT USING (parent_id = auth.uid());
@@ -210,6 +248,8 @@ CREATE POLICY consent_grants_grantee_select ON public.consent_grants
 
 -- === CONSENT_AUDIT_LOG table ===
 ALTER TABLE public.consent_audit_log ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS audit_log_parent_select ON public.consent_audit_log;
 
 -- Audit log is append-only: users can insert (logged via edge functions)
 -- Parents can read audit entries for their children
