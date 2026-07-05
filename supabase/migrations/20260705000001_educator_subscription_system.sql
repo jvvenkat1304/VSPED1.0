@@ -7,15 +7,18 @@
 
 -- ---------------------------------------------------------------------------
 -- 1. Ensure educator_profiles has the fields we need
+-- The existing table has: id, bio, qualifications, specializations, 
+-- experience_years, hourly_rate, photo_url, availability, is_verified, 
+-- is_active, rating
+-- We add: rci_number, rci_verified_at, subscription fields, subjects, 
+-- languages, city, session_rate_inr, max_group_size
+-- We reuse: is_verified (for RCI), is_active (keep as-is), bio (already exists)
 -- ---------------------------------------------------------------------------
 DO $$
 BEGIN
   -- RCI verification fields
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='rci_number') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN rci_number TEXT;
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='rci_verified') THEN
-    ALTER TABLE public.educator_profiles ADD COLUMN rci_verified BOOLEAN DEFAULT FALSE;
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='rci_verified_at') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN rci_verified_at TIMESTAMPTZ;
@@ -38,21 +41,18 @@ BEGIN
     ALTER TABLE public.educator_profiles ADD COLUMN razorpay_customer_id TEXT;
   END IF;
 
-  -- Profile fields for marketplace listing
+  -- Profile fields for marketplace listing (only add if missing)
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='subjects') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN subjects TEXT[] DEFAULT '{}';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='languages') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN languages TEXT[] DEFAULT '{}';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='bio') THEN
-    ALTER TABLE public.educator_profiles ADD COLUMN bio TEXT;
-  END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='city') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN city TEXT;
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='session_rate_inr') THEN
-    ALTER TABLE public.educator_profiles ADD COLUMN session_rate_inr INTEGER;  -- educator sets freely
+    ALTER TABLE public.educator_profiles ADD COLUMN session_rate_inr INTEGER;
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='max_group_size') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN max_group_size INTEGER DEFAULT 1 CHECK (max_group_size >= 1 AND max_group_size <= 8);
@@ -124,14 +124,14 @@ CREATE POLICY payments_educator_select ON public.subscription_payments
 DROP POLICY IF EXISTS educator_profiles_public_browse ON public.educator_profiles;
 CREATE POLICY educator_profiles_public_browse ON public.educator_profiles
   FOR SELECT USING (
-    rci_verified = TRUE 
+    is_verified = TRUE 
     AND subscription_status = 'active'
   );
 
 -- Educators can always read/write their own profile
 DROP POLICY IF EXISTS educator_profiles_own ON public.educator_profiles;
 CREATE POLICY educator_profiles_own ON public.educator_profiles
-  FOR ALL USING (user_id = auth.uid());
+  FOR ALL USING (id = auth.uid());
 
 -- =============================================================================
 -- NOTES:

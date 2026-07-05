@@ -46,8 +46,8 @@ Deno.serve(async (req) => {
     // Verify educator profile exists and is RCI-verified
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("educator_profiles")
-      .select("user_id, rci_verified, subscription_status")
-      .eq("user_id", user.id)
+      .select("id, is_verified, subscription_status")
+      .eq("id", user.id)
       .single();
 
     if (profileError || !profile) {
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!profile.rci_verified) {
+    if (!profile.is_verified) {
       return Response.json(
         { success: false, message: "RCI verification required before subscribing" },
         { status: 403 }
@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
         subscription_plan: plan_id,
         subscription_expires_at: expiresAt,
       })
-      .eq("user_id", user.id);
+      .eq("id", user.id);
 
     if (updateError) {
       return Response.json(

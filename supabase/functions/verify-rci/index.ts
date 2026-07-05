@@ -34,8 +34,8 @@ Deno.serve(async (req) => {
     // Get educator's profile
     const { data: profile, error: fetchError } = await supabaseAdmin
       .from("educator_profiles")
-      .select("user_id, rci_number, rci_verified")
-      .eq("user_id", user.id)
+      .select("id, rci_number, is_verified")
+      .eq("id", user.id)
       .single();
 
     if (fetchError || !profile) {
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (profile.rci_verified) {
+    if (profile.is_verified) {
       return Response.json({
         success: true,
         already_verified: true,
@@ -82,10 +82,10 @@ Deno.serve(async (req) => {
     const { error: updateError } = await supabaseAdmin
       .from("educator_profiles")
       .update({
-        rci_verified: true,
+        is_verified: true,
         rci_verified_at: new Date().toISOString(),
       })
-      .eq("user_id", user.id);
+      .eq("id", user.id);
 
     if (updateError) {
       return Response.json(

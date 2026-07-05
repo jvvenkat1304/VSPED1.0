@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("educator_profiles")
       .upsert({
-        user_id: user.id,
+        id: user.id,
         rci_number,
         subjects: subjects || [],
         languages: languages || [],
@@ -54,9 +54,9 @@ Deno.serve(async (req) => {
         city: city || null,
         session_rate_inr: session_rate_inr || null,
         max_group_size: max_group_size || 1,
-        // rci_verified remains false until verify-rci is called
-      }, { onConflict: "user_id" })
-      .select("user_id, rci_number, rci_verified, subscription_status")
+        // is_verified remains false until verify-rci is called
+      }, { onConflict: "id" })
+      .select("id, rci_number, is_verified, subscription_status")
       .single();
 
     if (profileError) {
@@ -69,9 +69,9 @@ Deno.serve(async (req) => {
     return Response.json({
       success: true,
       profile: {
-        user_id: profile.user_id,
+        user_id: profile.id,
         rci_number: profile.rci_number,
-        rci_verified: profile.rci_verified,
+        rci_verified: profile.is_verified,
         subscription_status: profile.subscription_status,
       },
       message: "Educator profile created. Please verify your RCI number to get listed.",
