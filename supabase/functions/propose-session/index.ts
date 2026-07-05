@@ -74,18 +74,18 @@ Deno.serve(async (req) => {
     const { data: session, error: insertError } = await supabaseAdmin
       .from("sessions")
       .insert({
-        educator_id: user.id,
+        special_educator_id: user.id,
         child_id,
         parent_id: grant.parent_id,
         consent_grant_id: grant.id,
-        scheduled_start: start.toISOString(),
-        scheduled_end: end.toISOString(),
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
         subject: subject || null,
         session_type: session_type || "1:1",
         participant_count: participant_count || 1,
         status: "proposed",
       })
-      .select("id, status, scheduled_start, scheduled_end")
+      .select("id, status, start_time, end_time")
       .single();
 
     if (insertError) {
@@ -101,8 +101,8 @@ Deno.serve(async (req) => {
       success: true,
       session_id: session.id,
       status: session.status,
-      scheduled_start: session.scheduled_start,
-      scheduled_end: session.scheduled_end,
+      scheduled_start: session.start_time,
+      scheduled_end: session.end_time,
       message: "Session proposed. Awaiting parent acceptance.",
     });
 

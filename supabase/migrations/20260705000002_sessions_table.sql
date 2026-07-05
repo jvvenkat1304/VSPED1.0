@@ -1,81 +1,83 @@
 -- =============================================================================
--- V-SPED: Sessions Table
+-- V-SPED: Sessions Table — Update existing table with consent + scheduling fields
 -- Created: July 5, 2026
--- Purpose: Tracks scheduled sessions between educators and children.
---   Educator proposes → parent accepts/rejects → session happens → completed.
---   Requires active consent grant for the educator to access child data.
+-- The sessions table already exists with: id, enrollment_id, special_educator_id,
+--   start_time, end_time, videosdk_room_id, status
+-- We add: child_id, parent_id, consent_grant_id, proposed_at, subject,
+--   session_type, participant_count, educator_notes_encrypted, cancelled_by,
+--   cancellation_reason, accepted_at, started_at, completed_at, updated_at
 -- =============================================================================
 
-CREATE TABLE IF NOT EXISTS public.sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  
-  -- Participants
-  educator_id UUID NOT NULL REFERENCES public.users(id),
-  child_id UUID NOT NULL REFERENCES public.children(id),
-  parent_id UUID NOT NULL REFERENCES public.users(id),  -- denormalised for fast RLS
-  
-  -- Linked consent (educator must have active consent to conduct session)
-  consent_grant_id UUID REFERENCES public.consent_grants(id),
-  
-  -- Scheduling
-  proposed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  scheduled_start TIMESTAMPTZ NOT NULL,
-  scheduled_end TIMESTAMPTZ NOT NULL,
-  
-  -- Status lifecycle: proposed → accepted → in_progress → completed | cancelled | no_show
-  status TEXT NOT NULL DEFAULT 'proposed' CHECK (status IN (
-    'proposed', 'accepted', 'rejected', 'cancelled', 
-    'in_progress', 'completed', 'no_show'
-  )),
-  
-  -- Session details
-  subject TEXT,               -- what the session covers
-  session_type TEXT DEFAULT '1:1' CHECK (session_type IN ('1:1', 'group')),
-  participant_count INTEGER DEFAULT 1 CHECK (participant_count >= 1 AND participant_count <= 8),
-  
-  -- Notes (encrypted — child data privacy rule applies)
-  educator_notes_encrypted TEXT,   -- only accessible with active consent
-  
-  -- Cancellation/rejection
-  cancelled_by UUID REFERENCES public.users(id),
-  cancellation_reason TEXT,
-  
-  -- Timestamps
-  accepted_at TIMESTAMPTZ,
-  started_at TIMESTAMPTZ,
-  completed_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  
-  -- Constraints
-  CONSTRAINT session_end_after_start CHECK (scheduled_end > scheduled_start)
-);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='child_id') THEN
+    ALTER TABLE public.sessions ADD COLUMN child_id UUID REFERENCES public.children(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='parent_id') THEN
+    ALTER TABLE public.sessions ADD COLUMN parent_id UUID REFERENCES public.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='consent_grant_id') THEN
+    ALTER TABLE public.sessions ADD COLUMN consent_grant_id UUID REFERENCES public.consent_grants(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='proposed_at') THEN
+    ALTER TABLE public.sessions ADD COLUMN proposed_at TIMESTAMPTZ DEFAULT NOW();
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='subject') THEN
+    ALTER TABLE public.sessions ADD COLUMN subject TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='session_type') THEN
+    ALTER TABLE public.sessions ADD COLUMN session_type TEXT DEFAULT '1:1';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='participant_count') THEN
+    ALTER TABLE public.sessions ADD COLUMN participant_count INTEGER DEFAULT 1;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='educator_notes_encrypted') THEN
+    ALTER TABLE public.sessions ADD COLUMN educator_notes_encrypted TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='cancelled_by') THEN
+    ALTER TABLE public.sessions ADD COLUMN cancelled_by UUID REFERENCES public.users(id);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='cancellation_reason') THEN
+    ALTER TABLE public.sessions ADD COLUMN cancellation_reason TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='accepted_at') THEN
+    ALTER TABLE public.sessions ADD COLUMN accepted_at TIMESTAMPTZ;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='started_at') THEN
+    ALTER TABLE public.sessions ADD COLUMN started_at TIMESTAMPTZ;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='completed_at') THEN
+    ALTER TABLE public.sessions ADD COLUMN completed_at TIMESTAMPTZ;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='sessions' AND column_name='updated_at') THEN
+    ALTER TABLE public.sessions ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
+  END IF;
+END $$;
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_sessions_educator ON public.sessions(educator_id, status);
+-- Indexes on new columns
+CREATE INDEX IF NOT EXISTS idx_sessions_special_educator ON public.sessions(special_educator_id, status);
 CREATE INDEX IF NOT EXISTS idx_sessions_parent ON public.sessions(parent_id, status);
 CREATE INDEX IF NOT EXISTS idx_sessions_child ON public.sessions(child_id);
-CREATE INDEX IF NOT EXISTS idx_sessions_scheduled ON public.sessions(scheduled_start) WHERE status IN ('accepted', 'in_progress');
 
 -- ---------------------------------------------------------------------------
--- RLS Policies
+-- RLS Policies (using actual column names: special_educator_id, parent_id)
 -- ---------------------------------------------------------------------------
 ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
 
 -- Educators see sessions they're part of
 DROP POLICY IF EXISTS sessions_educator_select ON public.sessions;
 CREATE POLICY sessions_educator_select ON public.sessions
-  FOR SELECT USING (educator_id = auth.uid());
+  FOR SELECT USING (special_educator_id = auth.uid());
 
 -- Educators can propose sessions (INSERT)
 DROP POLICY IF EXISTS sessions_educator_insert ON public.sessions;
 CREATE POLICY sessions_educator_insert ON public.sessions
-  FOR INSERT WITH CHECK (educator_id = auth.uid());
+  FOR INSERT WITH CHECK (special_educator_id = auth.uid());
 
 -- Educators can update their own sessions (start, complete, add notes)
 DROP POLICY IF EXISTS sessions_educator_update ON public.sessions;
 CREATE POLICY sessions_educator_update ON public.sessions
-  FOR UPDATE USING (educator_id = auth.uid());
+  FOR UPDATE USING (special_educator_id = auth.uid());
 
 -- Parents see sessions involving their children
 DROP POLICY IF EXISTS sessions_parent_select ON public.sessions;
@@ -88,7 +90,7 @@ CREATE POLICY sessions_parent_update ON public.sessions
   FOR UPDATE USING (parent_id = auth.uid());
 
 -- ---------------------------------------------------------------------------
--- Auto-update updated_at on any change
+-- Auto-update updated_at
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.update_sessions_timestamp()
 RETURNS TRIGGER AS $$
