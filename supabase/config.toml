@@ -96,3 +96,15 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/subscribe-educator/deno.json"
 entrypoint = "./functions/subscribe-educator/index.ts"
+
+[functions.propose-session]
+enabled = true
+verify_jwt = false
+import_map = "./functions/propose-session/deno.json"
+entrypoint = "./functions/propose-session/index.ts"
+
+[functions.respond-session]
+enabled = true
+verify_jwt = false
+import_map = "./functions/respond-session/deno.json"
+entrypoint = "./functions/respond-session/index.ts"
