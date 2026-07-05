@@ -210,6 +210,8 @@ Entries are added here automatically as work is performed in this session.
 | July 5, 2026 | Layer 10 advanced pentest script created + pushed | Created docs/security-tests/layer10-advanced-pentest.ps1: additional tests a 3rd-party pentester would run — T10.1 CORS misconfiguration (check if arbitrary origins allowed), T10.2 HTTP security headers (X-Content-Type-Options, X-Frame-Options, HSTS), T10.3 Rate limiting (10 rapid-fire calls, check for 429), T10.4 UUID enumeration resistance (4 guessable UUIDs), T10.5 Token privilege escalation (anon with fake service_role header), T10.6 Error verbosity (XML content-type, 8KB header). Plus manual checklist: Supabase 2FA, git history secret scan, esm.sh import pinning, plan tier, no MCP service_role access. Committed and pushed (commit f16d1dc). Expected warning: rate limiting (Supabase edge functions have no built-in throttling — flagged for future Upstash Redis integration). |
 | July 5, 2026 | Both security suites run: 37/37 PASS + 6/7 PASS (1 WARNING) | Re-ran main suite with fixed assertions: 37/37 PASS (all layers green). Ran Layer 10 advanced: 6/7 PASS, 1 WARNING (rate limiting — no 429 on 10 rapid calls, as expected since Supabase edge functions lack built-in throttling). CORS restrictive (good), security headers handled at gateway level, UUID enumeration blocked, token escalation rejected, no stack trace leaks, oversized headers handled. Manual checklist provided to user (Supabase 2FA, git secret scan, API key visibility, esm.sh pinning, plan tier). Rate limiting identified as the one remaining gap to address. |
 | July 5, 2026 | Rate limiting + supply chain hardening | Created migration 20260705000003_rate_limiting.sql: rate_limits table (identifier, action, timestamp), check_rate_limit() function (sliding window), cleanup_rate_limits(), RLS enabled with NO policies (invisible via REST). Updated send-otp to enforce 3 OTP/5min per phone (returns 429 when exceeded). Pinned all 13 edge function esm.sh imports from @2 (floating) to @2.49.1 (exact). Deployed send-otp. Committed and pushed (commit 909dbf2). Migration applied. Advanced pentest re-run: 7/7 PASS (rate limiting now returns 429 correctly). BACKEND V1 COMPLETE — all security tests pass (37/37 core + 7/7 advanced), all features deployed, all migrations applied. |
+| July 5, 2026 | Progress tracker created | Created docs/PROGRESS_TRACKER.md: 6-phase roadmap to demo-ready MVP (Backend Core ✅, Flutter Frontend, Razorpay Live, VideoSDK, E2E Testing, Demo Polish + App Store). Includes timeline estimate (~mid-August 2026), blockers/dependencies list, and "Done" criteria for both user types + funding demo. Overall progress: ~40%. Committed and pushed (commit 810ad8a). |
+| July 5, 2026 | Frontend framework decided: React Native + Expo | After assessing Flutter, React Native, Next.js+Capacitor, Kotlin Multiplatform, Ionic, .NET MAUI. Decision (Karan): React Native + Expo. Reasons: true native quality (not webview), TypeScript consistency with backend, Expo managed builds (no Xcode/Android Studio), OTA updates, web support built-in (Expo Router for investor demos), large developer pool. Full stack: Expo SDK 53+, Expo Router, Tamagui/NativeWind, Zustand, supabase-js, VideoSDK RN SDK, Razorpay RN SDK, React Native Reanimated, Detox+Jest. Code in `mobile/`. Web version confirmed: same codebase renders as web app via Expo Router, deployable to Vercel. FlutterFlow/Flutter approach abandoned. |
 
 ---
 
@@ -231,15 +233,36 @@ NeuroBridge is a connected but distinct product segment covering interactive gam
 
 ---
 
-## Frontend Strategy (decided June 19, 2026; confirmed July 1, 2026)
+## Frontend Strategy (decided June 19, 2026; confirmed July 1, 2026; framework decided July 5, 2026)
 
-- **Ejecting from FlutterFlow to Flutter code.** FlutterFlow's code export is one-way (no round-trip back to the visual canvas). All UI work from this point forward is done in Flutter/Dart code by Kiro.
-- **Preview:** via Flutter web (Chrome) — hot-reload, no emulator needed.
-- **Code location:** must live inside `K:\V-SPED\VSPED1.0\frontend\` for Kiro to access and edit.
-- **FlutterFlow existing pages:** to be copied out of FlutterFlow (Developer Menu → Download Code) and placed in `frontend/`. A paid FlutterFlow plan may be required.
-- **FlutterFlow → GitHub branch:** FlutterFlow's built-in GitHub integration pushes to a `flutterflow` branch (NOT `main`) to keep FF code separate from the Supabase backend on `main`.
-- **Build order:** auth screens first (backend fully done), feature screens after business logic is clarified.
-- **Brand assets pending:** logo file, hex color codes, font — user to provide; palette can also be pulled from vathsalya.co.in.
+- **Framework: React Native + Expo** (replaces Flutter/FlutterFlow decision). True native Android + iOS + Web from one TypeScript codebase.
+- **Why chosen:** native quality (no webview), TypeScript everywhere (matches backend), Expo managed builds (no Xcode/Android Studio needed), OTA updates post-launch, web support built-in (Expo Router), massive developer pool for future hires.
+- **Preview:** Expo Go app on phone (scan QR code) + web browser (localhost).
+- **Code location:** `K:\V-SPED\VSPED1.0\mobile\` (React Native + Expo project).
+- **Build for app stores:** `eas build` (Expo cloud — builds APK/IPA without local native tools).
+- **Web deployment:** Same code deployed to Vercel/similar for instant browser access (demos, investors).
+
+### Full Frontend Stack
+
+| Layer | Tool |
+|-------|------|
+| Framework | React Native (New Architecture, Fabric renderer) |
+| Dev environment | Expo SDK 53+ |
+| Navigation | Expo Router (file-based) |
+| UI Components | Tamagui or NativeWind (TBD based on design needs) |
+| State management | Zustand |
+| API client | supabase-js (official) |
+| Video calls | VideoSDK React Native SDK |
+| Payments | Razorpay React Native SDK |
+| Animations | React Native Reanimated (60fps native) |
+| Testing | Detox (E2E) + Jest (unit) |
+| Language | TypeScript (same as backend edge functions) |
+
+### Web Support
+- Expo Router renders the same screens as a responsive web app.
+- Deployable to Vercel / any hosting.
+- Investors get a URL → see the full app in their browser, no install needed.
+- Parents/educators can optionally use the web version.
 
 ---
 
