@@ -78,3 +78,21 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/revoke-consent/deno.json"
 entrypoint = "./functions/revoke-consent/index.ts"
+
+[functions.create-educator-profile]
+enabled = true
+verify_jwt = false
+import_map = "./functions/create-educator-profile/deno.json"
+entrypoint = "./functions/create-educator-profile/index.ts"
+
+[functions.verify-rci]
+enabled = true
+verify_jwt = false
+import_map = "./functions/verify-rci/deno.json"
+entrypoint = "./functions/verify-rci/index.ts"
+
+[functions.subscribe-educator]
+enabled = true
+verify_jwt = false
+import_map = "./functions/subscribe-educator/deno.json"
+entrypoint = "./functions/subscribe-educator/index.ts"
