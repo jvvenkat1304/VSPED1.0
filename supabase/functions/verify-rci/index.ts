@@ -1,5 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 // Verifies an educator's RCI (Rehabilitation Council of India) certificate number.
 // In production, this would query the RCI portal to validate the certificate.

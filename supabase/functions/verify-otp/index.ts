@@ -1,5 +1,5 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 // Verifies the phone OTP that Supabase generated (and MSG91 delivered).
 // Uses the ANON client for verifyOtp so a real session is returned, and a

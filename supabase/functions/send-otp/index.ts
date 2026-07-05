@@ -1,9 +1,17 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 // Starts Supabase's native phone OTP. Supabase generates the code and calls the
 // Send SMS Hook (send-sms-hook), which delivers it via MSG91. Verification is
 // handled by verify-otp using supabase.auth.verifyOtp.
+//
+// RATE LIMITED: max 3 OTP requests per phone per 5 minutes.
+
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
+
 Deno.serve(async (req) => {
   try {
     const { phone } = await req.json();
@@ -15,6 +23,22 @@ Deno.serve(async (req) => {
       );
     }
 
+    // --- RATE LIMITING: 3 requests per 5 minutes per phone ---
+    const { data: allowed } = await supabaseAdmin.rpc("check_rate_limit", {
+      p_identifier: phone,
+      p_action: "send_otp",
+      p_max_requests: 3,
+      p_window_minutes: 5,
+    });
+
+    if (allowed === false) {
+      return Response.json(
+        { success: false, message: "Too many OTP requests. Please wait a few minutes." },
+        { status: 429 }
+      );
+    }
+
+    // --- SEND OTP ---
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!
