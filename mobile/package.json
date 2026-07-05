@@ -1,0 +1,27 @@
+{
+  "name": "vsped-mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~5.0.0",
+    "@types/react": "^19.2.17",
+    "expo": "^53.0.27",
+    "expo-router": "~4.0.0",
+    "expo-status-bar": "~2.2.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.2.7",
+    "react-native": "^0.79.3",
+    "react-native-safe-area-context": "^5.8.0",
+    "react-native-screens": "^4.25.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "typescript": "~5.8.0"
+  }
+}
