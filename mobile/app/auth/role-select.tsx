@@ -20,8 +20,10 @@ export default function RoleSelectPage() {
         params: { user_id, session_token },
       });
     } else {
-      router.replace('/dashboard/educator');
-      // TODO: educator onboarding (profile + RCI)
+      router.replace({
+        pathname: '/onboarding/educator-setup',
+        params: { user_id, session_token },
+      });
     }
   };
 
