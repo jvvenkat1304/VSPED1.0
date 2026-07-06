@@ -53,13 +53,8 @@ export default function PinEntryPage() {
       const data = await response.json();
 
       if (data.success) {
-        // PIN verified — navigate to dashboard based on role
-        const userRole = data.role || role || 'parent';
-        if (userRole === 'special_educator') {
-          router.replace('/dashboard/educator');
-        } else {
-          router.replace('/dashboard/parent');
-        }
+        // PIN verified — navigate to parent dashboard (tab layout handles role)
+        router.replace('/dashboard/parent');
       } else {
         setError(data.message || 'Incorrect PIN');
         setPin('');
