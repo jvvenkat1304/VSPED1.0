@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     if (!isValid) {
       const failedAttempts = (userData.failed_pin_attempts ?? 0) + 1;
 
-      if (failedAttempts >= 3) {
+      if (failedAttempts >= 5) {
         // Lock account for 15 minutes
         const lockUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
         await supabase
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
         .eq("id", user_id);
 
       return Response.json(
-        { success: false, message: `Incorrect PIN. ${3 - failedAttempts} attempts remaining.` },
+        { success: false, message: `Incorrect PIN. ${5 - failedAttempts} attempts remaining.` },
         { status: 401 }
       );
     }

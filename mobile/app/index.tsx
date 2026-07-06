@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, Image, Pressable, ScrollView } from 'react-native';
+import { router } from 'expo-router';
 
 const Colors = {
   background: '#f9f7f1',
@@ -25,17 +26,11 @@ export default function StarterPage() {
 
       {/* Actions */}
       <View style={styles.actions}>
-        <Pressable style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Create Account</Text>
+        <Pressable style={styles.primaryButton} onPress={() => router.push('/auth/phone-entry')}>
+          <Text style={styles.primaryButtonText}>Get Started</Text>
         </Pressable>
 
-        <Pressable style={styles.secondaryButton}>
-          <Text style={styles.secondaryButtonText}>Continue with Phone</Text>
-        </Pressable>
-
-        <Pressable style={styles.textButton}>
-          <Text style={styles.textButtonText}>Login</Text>
-        </Pressable>
+        <Text style={styles.hint}>Sign up or log in with your phone number</Text>
       </View>
 
       <Text style={styles.footer}>
@@ -78,42 +73,26 @@ const styles = StyleSheet.create({
   },
   actions: {
     width: '100%',
-    gap: 14,
+    gap: 10,
     marginBottom: 30,
+    alignItems: 'center',
   },
   primaryButton: {
     backgroundColor: Colors.accent,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
+    width: '100%',
   },
   primaryButtonText: {
     color: '#ffffff',
     fontSize: 18,
     fontWeight: '600',
   },
-  secondaryButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  secondaryButtonText: {
-    color: Colors.primary,
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  textButton: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  textButtonText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
+  hint: {
+    fontSize: 14,
+    color: Colors.textLight,
+    marginTop: 4,
   },
   footer: {
     fontSize: 12,
