@@ -25,6 +25,26 @@ export default function OtpVerifyPage() {
   const inputs = useRef<(TextInput | null)[]>([]);
 
   const handleChange = (text: string, index: number) => {
+    // Handle paste/autofill: if text has multiple chars, spread across boxes
+    if (text.length > 1) {
+      const digits = text.replace(/\D/g, '').slice(0, 6).split('');
+      const newOtp = [...otp];
+      digits.forEach((d, i) => {
+        if (index + i < 6) newOtp[index + i] = d;
+      });
+      setOtp(newOtp);
+      setError('');
+
+      // Focus last filled box or submit
+      const lastIndex = Math.min(index + digits.length - 1, 5);
+      if (lastIndex === 5 && newOtp.join('').length === 6) {
+        verifyOtp(newOtp.join(''));
+      } else {
+        inputs.current[Math.min(lastIndex + 1, 5)]?.focus();
+      }
+      return;
+    }
+
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);

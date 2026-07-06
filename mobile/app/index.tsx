@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 
 const Colors = {
   background: '#f9f7f1',
@@ -9,6 +11,39 @@ const Colors = {
 };
 
 export default function StarterPage() {
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    checkExistingSession();
+  }, []);
+
+  const checkExistingSession = async () => {
+    try {
+      const userId = await SecureStore.getItemAsync('user_id');
+      const hasPin = await SecureStore.getItemAsync('has_pin');
+
+      if (userId && hasPin === 'true') {
+        // Returning user on same device — go straight to PIN
+        router.replace({
+          pathname: '/auth/pin-entry',
+          params: { user_id: userId, role: 'parent' },
+        });
+        return;
+      }
+    } catch (e) {
+      // No stored session — show starter page
+    }
+    setChecking(false);
+  };
+
+  if (checking) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Logo */}
