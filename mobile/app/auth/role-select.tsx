@@ -14,12 +14,14 @@ export default function RoleSelectPage() {
   const { user_id, session_token } = useLocalSearchParams<{ user_id: string; session_token: string }>();
 
   const handleSelectRole = (role: 'parent' | 'special_educator') => {
-    // TODO: Call an edge function to update the user's role if needed
-    // For now, navigate to the appropriate dashboard
     if (role === 'parent') {
-      router.replace('/dashboard/parent');
+      router.replace({
+        pathname: '/onboarding/parent-setup',
+        params: { user_id, session_token },
+      });
     } else {
       router.replace('/dashboard/educator');
+      // TODO: educator onboarding (profile + RCI)
     }
   };
 
