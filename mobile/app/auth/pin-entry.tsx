@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -53,8 +54,16 @@ export default function PinEntryPage() {
       const data = await response.json();
 
       if (data.success) {
-        // PIN verified — navigate to parent dashboard (tab layout handles role)
-        router.replace('/dashboard/parent');
+        // Update global auth store with the verified session
+        const sessionToken = data.session_token || session_token || '';
+        const userRole = data.role || role || 'parent';
+        await useAuthStore.getState().setAuth(user_id || '', sessionToken, userRole);
+        // PIN verified — navigate based on role
+        if (userRole === 'special_educator') {
+          router.replace('/dashboard/educator');
+        } else {
+          router.replace('/dashboard/parent');
+        }
       } else {
         setError(data.message || 'Incorrect PIN');
         setPin('');

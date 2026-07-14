@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -74,10 +75,10 @@ export default function SetPinPage() {
 
       const data = await response.json();
       if (data.success) {
-        // Store session locally so next login only needs PIN
-        await SecureStore.setItemAsync('user_id', user_id || '');
+        // Store session in global auth store (also persists to SecureStore)
+        await useAuthStore.getState().setAuth(user_id || '', session_token || '', role || 'parent');
+        // Mark that PIN has been created for quick login on next app launch
         await SecureStore.setItemAsync('has_pin', 'true');
-        await SecureStore.setItemAsync('session_token', session_token || '');
 
         // PIN created — navigate to role selection
         router.replace({

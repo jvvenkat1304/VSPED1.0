@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Switch } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 
 const Colors = {
@@ -35,12 +35,14 @@ export default function EducatorSetupPage() {
   const [bio, setBio] = useState('');
   const [city, setCity] = useState('');
   const [sessionRate, setSessionRate] = useState('');
+  const [minRate, setMinRate] = useState('');
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [rciVerified, setRciVerified] = useState(false);
+  const [attestationAccepted, setAttestationAccepted] = useState(false);
   const [step, setStep] = useState<'profile' | 'verification'>('profile');
 
   const toggleSubject = (subject: string) => {
@@ -61,6 +63,16 @@ export default function EducatorSetupPage() {
     if (selectedSubjects.length === 0) { setError('Select at least one subject'); return; }
     if (selectedLanguages.length === 0) { setError('Select at least one language'); return; }
 
+    // Validate min rate if both rates are filled
+    if (sessionRate && minRate) {
+      const parsedMinRate = parseInt(minRate);
+      const parsedSessionRate = parseInt(sessionRate);
+      if (parsedMinRate <= 0 || parsedMinRate < parsedSessionRate - 100) {
+        setError('Minimum rate must be within ₹100 of your listed rate');
+        return;
+      }
+    }
+
     setError('');
     setLoading(true);
 
@@ -80,6 +92,7 @@ export default function EducatorSetupPage() {
           bio: bio.trim() || null,
           city: city.trim() || null,
           session_rate_inr: sessionRate ? parseInt(sessionRate) : null,
+          min_rate_inr: minRate ? parseInt(minRate) : null,
         }),
       });
 
@@ -109,12 +122,20 @@ export default function EducatorSetupPage() {
           'Authorization': `Bearer ${session_token}`,
           'apikey': ANON_KEY,
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ attestation_accepted: true }),
       });
 
       const data = await response.json();
 
-      if (data.success || data.already_verified) {
+      if (response.status === 429) {
+        setError('Too many attempts. Please wait and try again later.');
+      } else if (response.status === 409) {
+        setError('This CRR number is already registered on another account');
+      } else if (response.status === 403) {
+        setError('Your account cannot perform verification');
+      } else if (response.status === 400) {
+        setError(data.message || 'Invalid CRR number format');
+      } else if (data.success || data.already_verified) {
         setRciVerified(true);
         // Wait a moment then navigate to educator dashboard
         setTimeout(() => router.replace('/dashboard/educator'), 1500);
@@ -130,24 +151,43 @@ export default function EducatorSetupPage() {
 
   if (step === 'verification') {
     return (
-      <View style={styles.verifyContainer}>
+      <ScrollView style={styles.verifyScrollContainer} contentContainerStyle={styles.verifyScrollContent}>
         <Text style={styles.verifyEmoji}>{rciVerified ? '✅' : '🔐'}</Text>
         <Text style={styles.verifyTitle}>
-          {rciVerified ? 'RCI Verified!' : 'Verify your RCI Credentials'}
+          {rciVerified ? 'Provisionally Verified!' : 'Verify your RCI Credentials'}
         </Text>
         <Text style={styles.verifySubtitle}>
           {rciVerified
-            ? 'Your profile is now live. Redirecting to your dashboard...'
-            : `We'll check your RCI number (${rciNumber}) against the Rehabilitation Council of India registry.`}
+            ? 'Your profile is now visible while we complete manual review. Redirecting to your dashboard...'
+            : `We'll validate your CRR number (${rciNumber}) format and record your self-attestation.`}
         </Text>
 
         {!rciVerified && (
           <>
+            {/* Attestation Section */}
+            <View style={styles.attestationContainer}>
+              <Text style={styles.attestationTitle}>Self-Attestation Declaration</Text>
+              <Text style={styles.attestationText}>
+                I hereby declare that the CRR number provided is genuine, currently valid, and registered under my name with the Rehabilitation Council of India. I understand that providing false information may result in permanent ban from this platform and legal action under applicable Indian law including the Information Technology Act, 2000 and Indian Penal Code.
+              </Text>
+            </View>
+
+            <View style={styles.checkboxRow}>
+              <Switch
+                value={attestationAccepted}
+                onValueChange={setAttestationAccepted}
+                trackColor={{ false: Colors.border, true: Colors.accent }}
+                thumbColor={attestationAccepted ? '#ffffff' : '#f4f3f4'}
+              />
+              <Text style={styles.checkboxLabel}>I agree to the above declaration</Text>
+            </View>
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
+
             <Pressable
-              style={[styles.button, verifying && styles.buttonDisabled]}
+              style={[styles.button, (!attestationAccepted || verifying) && styles.buttonDisabled]}
               onPress={handleVerifyRci}
-              disabled={verifying}
+              disabled={!attestationAccepted || verifying}
             >
               <Text style={styles.buttonText}>
                 {verifying ? 'Verifying...' : 'Verify Now'}
@@ -157,11 +197,11 @@ export default function EducatorSetupPage() {
         )}
 
         {rciVerified && (
-          <View style={styles.successBadge}>
-            <Text style={styles.successText}>✓ RCI Certified Educator</Text>
+          <View style={styles.provisionalBadge}>
+            <Text style={styles.provisionalText}>⏳ Provisionally Verified</Text>
           </View>
         )}
-      </View>
+      </ScrollView>
     );
   }
 
@@ -194,13 +234,13 @@ export default function EducatorSetupPage() {
           <Text style={styles.label}>RCI Registration Number *</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g. A12345"
+            placeholder="e.g. SE12345"
             placeholderTextColor={Colors.placeholder}
             value={rciNumber}
             onChangeText={setRciNumber}
             autoCapitalize="characters"
           />
-          <Text style={styles.hint}>This will be verified against the RCI portal</Text>
+          <Text style={styles.hint}>Your CRR number from the Rehabilitation Council of India (e.g. SE12345)</Text>
         </View>
 
         {/* Subjects */}
@@ -263,6 +303,20 @@ export default function EducatorSetupPage() {
             onChangeText={setSessionRate}
             keyboardType="numeric"
           />
+        </View>
+
+        {/* Minimum Rate */}
+        <View style={styles.field}>
+          <Text style={styles.label}>Minimum Acceptable Rate (₹ per session)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. 700"
+            placeholderTextColor={Colors.placeholder}
+            value={minRate}
+            onChangeText={setMinRate}
+            keyboardType="numeric"
+          />
+          <Text style={styles.hint}>The lowest rate you'll accept. Parents won't see this.</Text>
         </View>
 
         {/* Bio */}
@@ -396,6 +450,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   // Verification step styles
+  verifyScrollContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  verifyScrollContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    paddingTop: 80,
+    paddingBottom: 40,
+  },
   verifyContainer: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -420,6 +485,53 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 28,
+  },
+  // Attestation styles
+  attestationContainer: {
+    backgroundColor: '#fefcf8',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 18,
+    width: '100%',
+  },
+  attestationTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  attestationText: {
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 19,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
+    gap: 10,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: '500',
+    flex: 1,
+  },
+  provisionalBadge: {
+    backgroundColor: '#fef9ec',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#d4a35d',
+  },
+  provisionalText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#b8860b',
   },
   successBadge: {
     backgroundColor: '#eef7f4',

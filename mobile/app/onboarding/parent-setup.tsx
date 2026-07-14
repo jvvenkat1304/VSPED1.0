@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -19,11 +20,15 @@ const BASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co/functions/v1';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
 
 export default function ParentSetupPage() {
-  const { user_id, session_token } = useLocalSearchParams<{ user_id: string; session_token: string }>();
+  const { user_id, session_token: paramToken } = useLocalSearchParams<{ user_id: string; session_token: string }>();
+  const storeToken = useAuthStore(state => state.sessionToken);
+  const session_token = storeToken || paramToken || '';
   
   const [parentName, setParentName] = useState('');
   const [childName, setChildName] = useState('');
-  const [childDob, setChildDob] = useState('');
+  const [dobDay, setDobDay] = useState('');
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobYear, setDobYear] = useState('');
   const [childGender, setChildGender] = useState<'male' | 'female' | 'other' | ''>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,12 +42,32 @@ export default function ParentSetupPage() {
       setError("Please enter your child's name");
       return;
     }
+    if (!dobDay || !dobMonth || !dobYear) {
+      setError("Date of birth is required for age assessment");
+      return;
+    }
+
+    // Build and validate the date
+    const day = parseInt(dobDay, 10);
+    const month = parseInt(dobMonth, 10);
+    const year = parseInt(dobYear, 10);
+    
+    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2000 || year > new Date().getFullYear()) {
+      setError('Please enter a valid date of birth');
+      return;
+    }
+
+    const dobFormatted = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dobDate = new Date(dobFormatted);
+    if (isNaN(dobDate.getTime()) || dobDate > new Date()) {
+      setError('Please enter a valid date of birth');
+      return;
+    }
 
     setError('');
     setLoading(true);
 
     try {
-      // Create child profile (encrypted on backend)
       const response = await fetch(`${BASE_URL}/create-child`, {
         method: 'POST',
         headers: {
@@ -52,7 +77,7 @@ export default function ParentSetupPage() {
         },
         body: JSON.stringify({
           name: childName.trim(),
-          dob: childDob || null,
+          dob: dobFormatted,
           gender: childGender || null,
         }),
       });
@@ -60,10 +85,11 @@ export default function ParentSetupPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Navigate to parent dashboard
         router.replace('/dashboard/parent');
       } else {
-        setError(data.message || 'Failed to create profile. Try again.');
+        // Show detailed error for debugging
+        const detail = data.detail ? ` (${data.detail})` : '';
+        setError((data.message || 'Failed to create profile.') + detail);
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -118,16 +144,37 @@ export default function ParentSetupPage() {
 
         {/* Child DOB */}
         <View style={styles.field}>
-          <Text style={styles.label}>Date of Birth (optional)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={Colors.placeholder}
-            value={childDob}
-            onChangeText={setChildDob}
-            keyboardType="numeric"
-            maxLength={10}
-          />
+          <Text style={styles.label}>Date of Birth *</Text>
+          <View style={styles.dobRow}>
+            <TextInput
+              style={[styles.input, styles.dobInput]}
+              placeholder="DD"
+              placeholderTextColor={Colors.placeholder}
+              value={dobDay}
+              onChangeText={(t) => setDobDay(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              keyboardType="number-pad"
+              maxLength={2}
+            />
+            <TextInput
+              style={[styles.input, styles.dobInput]}
+              placeholder="MM"
+              placeholderTextColor={Colors.placeholder}
+              value={dobMonth}
+              onChangeText={(t) => setDobMonth(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              keyboardType="number-pad"
+              maxLength={2}
+            />
+            <TextInput
+              style={[styles.input, styles.dobInputYear]}
+              placeholder="YYYY"
+              placeholderTextColor={Colors.placeholder}
+              value={dobYear}
+              onChangeText={(t) => setDobYear(t.replace(/[^0-9]/g, '').slice(0, 4))}
+              keyboardType="number-pad"
+              maxLength={4}
+            />
+          </View>
+          <Text style={styles.hint}>Required for age assessment</Text>
         </View>
 
         {/* Gender */}
@@ -211,6 +258,24 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     fontSize: 16,
     color: Colors.text,
+  },
+  hint: {
+    fontSize: 12,
+    color: Colors.textLight,
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  dobRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  dobInput: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  dobInputYear: {
+    flex: 1.5,
+    textAlign: 'center',
   },
   divider: {
     marginVertical: 24,

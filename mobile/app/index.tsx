@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { useAuthStore } from '../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -12,31 +13,29 @@ const Colors = {
 
 export default function StarterPage() {
   const [checking, setChecking] = useState(true);
+  const isLoading = useAuthStore(state => state.isLoading);
 
   useEffect(() => {
     checkExistingSession();
   }, []);
 
   const checkExistingSession = async () => {
-    try {
-      const userId = await SecureStore.getItemAsync('user_id');
-      const hasPin = await SecureStore.getItemAsync('has_pin');
+    const userId = await SecureStore.getItemAsync('user_id');
+    const hasPin = await SecureStore.getItemAsync('has_pin');
+    const storedRole = await SecureStore.getItemAsync('role');
 
-      if (userId && hasPin === 'true') {
-        // Returning user on same device — go straight to PIN
-        router.replace({
-          pathname: '/auth/pin-entry',
-          params: { user_id: userId, role: 'parent' },
-        });
-        return;
-      }
-    } catch (e) {
-      // No stored session — show starter page
+    if (userId && hasPin === 'true') {
+      // Returning user on same device — go straight to PIN
+      router.replace({
+        pathname: '/auth/pin-entry',
+        params: { user_id: userId, role: storedRole || 'parent' },
+      });
+      return;
     }
     setChecking(false);
   };
 
-  if (checking) {
+  if (checking || isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
         <ActivityIndicator size="large" color={Colors.accent} />

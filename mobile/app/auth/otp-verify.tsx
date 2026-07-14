@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -88,6 +89,13 @@ export default function OtpVerifyPage() {
       const data = await response.json();
 
       if (data.success) {
+        // Store auth immediately so all subsequent screens have access
+        await useAuthStore.getState().setAuth(
+          data.user_id,
+          data.session_token,
+          data.role || 'parent'
+        );
+
         if (data.is_new_user) {
           // New user — go to PIN creation
           router.replace({
@@ -139,9 +147,11 @@ export default function OtpVerifyPage() {
               onChangeText={(text) => handleChange(text, index)}
               onKeyPress={(e) => handleKeyPress(e, index)}
               keyboardType="number-pad"
-              maxLength={1}
+              maxLength={index === 0 ? 6 : 1}
               autoFocus={index === 0}
               selectTextOnFocus
+              textContentType={index === 0 ? 'oneTimeCode' : 'none'}
+              autoComplete={index === 0 ? 'sms-otp' : 'off'}
             />
           ))}
         </View>

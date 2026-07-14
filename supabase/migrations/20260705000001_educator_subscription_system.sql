@@ -24,7 +24,7 @@ BEGIN
     ALTER TABLE public.educator_profiles ADD COLUMN rci_verified_at TIMESTAMPTZ;
   END IF;
 
-  -- Subscription fields
+  -- Subscription fieldsSt
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='educator_profiles' AND column_name='subscription_status') THEN
     ALTER TABLE public.educator_profiles ADD COLUMN subscription_status TEXT DEFAULT 'none' CHECK (subscription_status IN ('none', 'trial', 'active', 'expired', 'cancelled'));
   END IF;

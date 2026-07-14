@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Update Progress Tracker",
+  "description": "After each agent stop, reviews what was accomplished and updates the progress tracker (docs/PROGRESS_TRACKER.md) if any task status changed, milestone progressed, or blocker was resolved. Does NOT modify if nothing meaningful changed.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review what was done in this session. If any milestone progressed, task was completed, blocker was resolved, or status changed, update docs/PROGRESS_TRACKER.md accordingly — change task statuses (⬜ → 🔄 → ✅), update progress percentages, update the \"Last Updated\" date, and move resolved blockers. If nothing meaningful changed (only questions answered or files read), do NOT modify the document. Do not invent progress that wasn't made."
+  }
+}

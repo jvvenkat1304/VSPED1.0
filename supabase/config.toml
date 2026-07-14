@@ -108,3 +108,57 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/respond-session/deno.json"
 entrypoint = "./functions/respond-session/index.ts"
+
+[functions.admin-verify-educator]
+enabled = true
+verify_jwt = false
+import_map = "./functions/admin-verify-educator/deno.json"
+entrypoint = "./functions/admin-verify-educator/index.ts"
+
+[functions.create-proposal]
+enabled = true
+verify_jwt = false
+import_map = "./functions/create-proposal/deno.json"
+entrypoint = "./functions/create-proposal/index.ts"
+
+[functions.respond-proposal]
+enabled = true
+verify_jwt = false
+import_map = "./functions/respond-proposal/deno.json"
+entrypoint = "./functions/respond-proposal/index.ts"
+
+[functions.respond-counter]
+enabled = true
+verify_jwt = false
+import_map = "./functions/respond-counter/deno.json"
+entrypoint = "./functions/respond-counter/index.ts"
+
+[functions.get-proposals]
+enabled = true
+verify_jwt = false
+import_map = "./functions/get-proposals/deno.json"
+entrypoint = "./functions/get-proposals/index.ts"
+
+[functions.expire-proposals]
+enabled = true
+verify_jwt = false
+import_map = "./functions/expire-proposals/deno.json"
+entrypoint = "./functions/expire-proposals/index.ts"
+
+[functions.razorpay-webhook]
+enabled = true
+verify_jwt = false
+import_map = "./functions/razorpay-webhook/deno.json"
+entrypoint = "./functions/razorpay-webhook/index.ts"
+
+[functions.create-payment-order]
+enabled = true
+verify_jwt = false
+import_map = "./functions/create-payment-order/deno.json"
+entrypoint = "./functions/create-payment-order/index.ts"
+
+[functions.verify-subscription]
+enabled = true
+verify_jwt = false
+import_map = "./functions/verify-subscription/deno.json"
+entrypoint = "./functions/verify-subscription/index.ts"

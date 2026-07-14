@@ -1,4 +1,12 @@
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { router } from 'expo-router';
+import ParentProposalsView from '../../components/ParentProposalsView';
+import NotificationFeed from '../../components/NotificationFeed';
+import ConsentManagement from '../../components/ConsentManagement';
+import ChildProfile from '../../components/ChildProfile';
+import Settings from '../../components/Settings';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   background: '#f9f7f1',
@@ -11,39 +19,88 @@ const Colors = {
   card: '#ffffff',
 };
 
+type ActiveView = 'dashboard' | 'proposals' | 'notifications' | 'consent' | 'children' | 'settings';
+
 export default function ParentDashboard() {
+  const sessionToken = useAuthStore(state => state.sessionToken) || '';
+  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+
+  // Render inline views based on active state
+  if (activeView !== 'dashboard') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.proposalsHeader}>
+          <Pressable style={styles.backBtn} onPress={() => setActiveView('dashboard')}>
+            <Text style={styles.backBtnText}>← Back</Text>
+          </Pressable>
+        </View>
+        {activeView === 'notifications' && <NotificationFeed sessionToken={sessionToken} />}
+        {activeView === 'proposals' && <ParentProposalsView sessionToken={sessionToken} />}
+        {activeView === 'consent' && <ConsentManagement sessionToken={sessionToken} />}
+        {activeView === 'children' && <ChildProfile sessionToken={sessionToken} />}
+        {activeView === 'settings' && <Settings />}
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, Parent 👋</Text>
-        <Text style={styles.subtitle}>What would you like to do today?</Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.greeting}>Hello, Parent 👋</Text>
+            <Text style={styles.subtitle}>What would you like to do today?</Text>
+          </View>
+          {/* Header Icons */}
+          <View style={styles.headerIcons}>
+            <Pressable
+              style={styles.iconButton}
+              onPress={() => setActiveView('settings')}
+            >
+              <Text style={styles.iconEmoji}>⚙️</Text>
+            </Pressable>
+            <Pressable
+              style={styles.iconButton}
+              onPress={() => setActiveView('notifications')}
+            >
+              <Text style={styles.iconEmoji}>🔔</Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
 
       {/* Quick Actions */}
       <View style={styles.grid}>
-        <Pressable style={styles.actionCard}>
+        <Pressable style={styles.actionCard} onPress={() => router.push('/dashboard/search')}>
           <Text style={styles.actionEmoji}>🔍</Text>
           <Text style={styles.actionTitle}>Find Educators</Text>
           <Text style={styles.actionDesc}>Browse RCI-verified special educators</Text>
         </Pressable>
 
-        <Pressable style={styles.actionCard}>
+        <Pressable style={styles.actionCard} onPress={() => setActiveView('children')}>
           <Text style={styles.actionEmoji}>👶</Text>
           <Text style={styles.actionTitle}>My Children</Text>
           <Text style={styles.actionDesc}>Manage child profiles</Text>
         </Pressable>
 
-        <Pressable style={styles.actionCard}>
+        <Pressable style={styles.actionCard} onPress={() => setActiveView('proposals')}>
           <Text style={styles.actionEmoji}>📅</Text>
           <Text style={styles.actionTitle}>Sessions</Text>
-          <Text style={styles.actionDesc}>View upcoming sessions</Text>
+          <Text style={styles.actionDesc}>View proposals & sessions</Text>
         </Pressable>
 
-        <Pressable style={styles.actionCard}>
+        <Pressable style={styles.actionCard} onPress={() => setActiveView('consent')}>
           <Text style={styles.actionEmoji}>🔒</Text>
           <Text style={styles.actionTitle}>Privacy</Text>
           <Text style={styles.actionDesc}>Manage data access & consent</Text>
+        </Pressable>
+
+        {/* My Proposals Card */}
+        <Pressable style={[styles.actionCard, styles.proposalsCard]} onPress={() => setActiveView('proposals')}>
+          <Text style={styles.actionEmoji}>📋</Text>
+          <Text style={styles.actionTitle}>My Proposals</Text>
+          <Text style={styles.actionDesc}>Track session proposals & payments</Text>
         </Pressable>
       </View>
 
@@ -66,6 +123,31 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 32,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.card,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  iconEmoji: {
+    fontSize: 20,
   },
   greeting: {
     fontSize: 28,
@@ -94,6 +176,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
   },
+  proposalsCard: {
+    borderWidth: 1,
+    borderColor: Colors.accent,
+  },
   actionEmoji: {
     fontSize: 28,
     marginBottom: 10,
@@ -119,5 +205,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
     lineHeight: 18,
+  },
+  // Inline view header
+  proposalsHeader: {
+    paddingTop: 56,
+    paddingHorizontal: 20,
+    paddingBottom: 8,
+  },
+  backBtn: {
+    paddingVertical: 8,
+  },
+  backBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });

@@ -1,5 +1,11 @@
-import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, FlatList } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { router } from 'expo-router';
+import { createClient } from '@supabase/supabase-js';
+import { useAuthStore } from '../../store/authStore';
+
+const SUPABASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
 
 const Colors = {
   background: '#f9f7f1',
@@ -20,22 +26,116 @@ const SUBJECTS = [
   'Special Education', 'Maths', 'Science', 'English', 'Social Skills',
 ];
 
-// Placeholder data — will be replaced with live backend search
-const MOCK_EDUCATORS = [
-  { id: '1', name: 'Dr. Priya Sharma', subjects: ['Speech Therapy', 'Social Skills'], languages: ['English', 'Hindi'], rating: 4.8, rate: 800, verified: true },
-  { id: '2', name: 'Anita Reddy', subjects: ['Occupational Therapy'], languages: ['English', 'Telugu'], rating: 4.6, rate: 600, verified: true },
-  { id: '3', name: 'Rajesh Kumar', subjects: ['Special Education', 'Maths'], languages: ['Hindi', 'English'], rating: 4.9, rate: 1000, verified: true },
-];
+interface Educator {
+  id: string;
+  name: string;
+  subjects: string[];
+  languages: string[];
+  rating: string;
+  rate: number;
+  verification_status: 'provisionally_verified' | 'verified';
+  bio: string;
+  city: string;
+}
 
 export default function SearchScreen() {
+  const sessionToken = useAuthStore(state => state.sessionToken);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('All');
+  const [educators, setEducators] = useState<Educator[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK_EDUCATORS.filter((e) => {
+  useEffect(() => {
+    fetchEducators();
+  }, [sessionToken]);
+
+  async function fetchEducators() {
+    setLoading(true);
+    try {
+      // Create authenticated client to avoid RLS recursion on users table
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { headers: sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {} }
+      });
+      // Query educator_profiles — RLS automatically filters to
+      // verification_status IN ('provisionally_verified', 'verified') AND subscription_status = 'active'
+      const { data: profiles, error } = await supabase
+        .from('educator_profiles')
+        .select('id, rci_number, subjects, languages, city, session_rate_inr, verification_status, bio');
+
+      if (error) {
+        console.error('Error fetching educators:', error.message);
+        setEducators([]);
+        setLoading(false);
+        return;
+      }
+
+      if (!profiles || profiles.length === 0) {
+        setEducators([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch user names for the educators (educator_profiles.id = users.id)
+      // Using try/catch because users table RLS can cause issues with some auth states
+      const userIds = profiles.map((p) => p.id).filter(Boolean);
+      let userNames: Record<string, string> = {};
+
+      if (userIds.length > 0) {
+        try {
+          const { data: users, error: usersError } = await supabase
+            .from('users')
+            .select('id, full_name')
+            .in('id', userIds);
+
+          if (!usersError && users) {
+            userNames = users.reduce((acc: Record<string, string>, u) => {
+              acc[u.id] = u.full_name || 'Educator';
+              return acc;
+            }, {});
+          }
+        } catch {
+          // Silently fail — we'll show 'Educator' as fallback
+        }
+      }
+
+      // Map to the format needed by FlatList
+      const mapped: Educator[] = profiles.map((p) => ({
+        id: p.id,
+        name: userNames[p.id] || 'Educator',
+        subjects: p.subjects || [],
+        languages: p.languages || [],
+        rating: 'New',
+        rate: p.session_rate_inr || 0,
+        verification_status: p.verification_status,
+        bio: p.bio || '',
+        city: p.city || '',
+      }));
+
+      setEducators(mapped);
+    } catch (err) {
+      console.error('Unexpected error fetching educators:', err);
+      setEducators([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Client-side filtering on the fetched data
+  const filtered = educators.filter((e) => {
     const matchesSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSubject = selectedSubject === 'All' || e.subjects.includes(selectedSubject);
     return matchesSearch && matchesSubject;
   });
+
+  function renderVerificationBadge(status: Educator['verification_status']) {
+    if (status === 'verified') {
+      return <Text style={styles.verifiedBadge}>✓ RCI Verified</Text>;
+    }
+    if (status === 'provisionally_verified') {
+      return <Text style={styles.pendingBadge}>⏳ Pending</Text>;
+    }
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -71,38 +171,61 @@ export default function SearchScreen() {
         ))}
       </ScrollView>
 
-      {/* Results */}
-      <FlatList
-        data={filtered}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.results}
-        renderItem={({ item }) => (
-          <Pressable style={styles.educatorCard}>
-            <View style={styles.cardHeader}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
-              </View>
-              <View style={styles.cardInfo}>
-                <View style={styles.nameRow}>
-                  <Text style={styles.educatorName}>{item.name}</Text>
-                  {item.verified && <Text style={styles.verifiedBadge}>✓ RCI</Text>}
+      {/* Loading State */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+          <Text style={styles.loadingText}>Loading educators...</Text>
+        </View>
+      ) : (
+        /* Results */
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.results}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.educatorCard}
+              onPress={() => router.push({
+                pathname: '/educator-profile',
+                params: {
+                  id: item.id,
+                  name: item.name,
+                  subjects: JSON.stringify(item.subjects),
+                  languages: JSON.stringify(item.languages),
+                  rate: String(item.rate),
+                  verification_status: item.verification_status,
+                  bio: item.bio,
+                  city: item.city,
+                },
+              })}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
                 </View>
-                <Text style={styles.subjects}>{item.subjects.join(' • ')}</Text>
-                <Text style={styles.languages}>🗣️ {item.languages.join(', ')}</Text>
+                <View style={styles.cardInfo}>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.educatorName}>{item.name}</Text>
+                    {renderVerificationBadge(item.verification_status)}
+                  </View>
+                  <Text style={styles.subjects}>{item.subjects.join(' • ')}</Text>
+                  <Text style={styles.languages}>🗣️ {item.languages.join(', ')}</Text>
+                </View>
               </View>
+              <View style={styles.cardFooter}>
+                <Text style={styles.rating}>⭐ {item.rating}</Text>
+                <Text style={styles.rate}>₹{item.rate}/session</Text>
+              </View>
+            </Pressable>
+          )}
+          ListEmptyComponent={
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>No educators found matching your filters.</Text>
             </View>
-            <View style={styles.cardFooter}>
-              <Text style={styles.rating}>⭐ {item.rating}</Text>
-              <Text style={styles.rate}>₹{item.rate}/session</Text>
-            </View>
-          </Pressable>
-        )}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyText}>No educators found matching your filters.</Text>
-          </View>
-        }
-      />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -222,9 +345,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.success,
     backgroundColor: '#eef7f4',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  pendingBadge: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.accent,
+    backgroundColor: '#fef9f0',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   subjects: {
     fontSize: 13,
@@ -258,6 +392,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
+    fontSize: 14,
+    color: Colors.textLight,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  loadingText: {
+    marginTop: 12,
     fontSize: 14,
     color: Colors.textLight,
   },

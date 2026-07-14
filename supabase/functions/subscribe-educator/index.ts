@@ -1,24 +1,26 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
-// Creates a Razorpay subscription for the educator.
-// Flow: educator selects a plan → this function creates a Razorpay subscription
-// → returns the subscription link/id for payment → webhook confirms payment.
-//
-// For now (pre-Razorpay integration): activates the subscription directly
-// with a placeholder. Once Razorpay is set up, this will:
-//   1. Create a Razorpay customer (if not exists)
-//   2. Create a Razorpay subscription with the plan
-//   3. Return the short_url for payment
-//   4. A separate webhook handles payment confirmation
+// Educator subscription via Razorpay Payment Links (one-time annual payment).
+// Flow: educator selects plan → creates Payment Link → educator pays in browser →
+// webhook (payment.captured) confirms payment → subscription activates.
+
+const RAZORPAY_BASE = "https://api.razorpay.com/v1";
 
 const supabaseAdmin = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
 
+function getRazorpayAuth(): string {
+  const keyId = Deno.env.get("RAZORPAY_KEY_ID")!;
+  const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET")!;
+  return "Basic " + btoa(`${keyId}:${keySecret}`);
+}
+
 Deno.serve(async (req) => {
   try {
+    // --- 1. Auth: verify JWT ---
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
@@ -34,16 +36,18 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const { plan_id } = await req.json();
+    // --- 2. Parse request ---
+    const body = await req.json();
+    const planId = body.plan_id || "basic";
 
-    if (!plan_id || !["basic", "premium"].includes(plan_id)) {
+    if (!["basic", "premium"].includes(planId)) {
       return Response.json(
         { success: false, message: "plan_id must be 'basic' or 'premium'" },
         { status: 400 }
       );
     }
 
-    // Verify educator profile exists and is RCI-verified
+    // --- 3. Verify educator profile ---
     const { data: profile, error: profileError } = await supabaseAdmin
       .from("educator_profiles")
       .select("id, is_verified, subscription_status")
@@ -72,11 +76,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Get the plan details
+    // --- 4. Get plan details ---
     const { data: plan } = await supabaseAdmin
       .from("subscription_plans")
       .select("*")
-      .eq("id", plan_id)
+      .eq("id", planId)
       .eq("active", true)
       .single();
 
@@ -87,58 +91,85 @@ Deno.serve(async (req) => {
       );
     }
 
-    // -----------------------------------------------------------------
-    // TODO: Razorpay integration
-    // When Razorpay is configured:
-    //   1. const razorpay = new Razorpay({ key_id, key_secret });
-    //   2. Create customer: razorpay.customers.create(...)
-    //   3. Create subscription: razorpay.subscriptions.create(...)
-    //   4. Return subscription.short_url for the educator to pay
-    //   5. Payment confirmation comes via webhook → activates subscription
-    //
-    // For now: directly activate (simulates successful payment)
-    // -----------------------------------------------------------------
+    // --- 5. Create Razorpay Payment Link (one-time payment) ---
+    const amountPaise = plan.price_inr * 100;
 
-    const expiresAt = new Date(Date.now() + plan.duration_days * 24 * 60 * 60 * 1000).toISOString();
+    const paymentLinkPayload: Record<string, unknown> = {
+      amount: amountPaise,
+      currency: "INR",
+      description: `V-SPED ${plan.name} — Annual Subscription`,
+      customer: {},
+      notify: { sms: false, email: false },
+      notes: {
+        educator_id: user.id,
+        plan_id: planId,
+        type: "subscription",
+        platform: "v-sped",
+      },
+      // No callback_url — Razorpay shows its own success page
+      // User returns to app manually and refreshes to see active status
+    };
 
-    // Activate subscription
-    const { error: updateError } = await supabaseAdmin
-      .from("educator_profiles")
-      .update({
-        subscription_status: "active",
-        subscription_plan: plan_id,
-        subscription_expires_at: expiresAt,
-      })
-      .eq("id", user.id);
+    // Add contact info if available
+    if (user.phone) {
+      (paymentLinkPayload.customer as Record<string, string>).contact = user.phone;
+    }
+    if (user.email) {
+      (paymentLinkPayload.customer as Record<string, string>).email = user.email;
+    }
 
-    if (updateError) {
+    const linkResponse = await fetch(`${RAZORPAY_BASE}/payment_links`, {
+      method: "POST",
+      headers: {
+        "Authorization": getRazorpayAuth(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paymentLinkPayload),
+    });
+
+    if (!linkResponse.ok) {
+      const error = await linkResponse.text();
+      console.error("Razorpay payment link creation failed:", error);
       return Response.json(
-        { success: false, message: "Failed to activate subscription", detail: updateError.message },
-        { status: 500 }
+        { success: false, message: "Failed to create payment link" },
+        { status: 502 }
       );
     }
 
-    // Record the payment
+    const paymentLink = await linkResponse.json();
+
+    // --- 6. Store pending subscription state ---
+    await supabaseAdmin
+      .from("educator_profiles")
+      .update({
+        subscription_status: "pending",
+        subscription_plan: planId,
+      })
+      .eq("id", user.id);
+
+    // Record the pending payment
     await supabaseAdmin
       .from("subscription_payments")
       .insert({
         educator_id: user.id,
-        plan_id: plan_id,
+        plan_id: planId,
         amount_inr: plan.price_inr,
-        status: "captured",  // placeholder — in production, starts as 'pending' until webhook confirms
-        paid_at: new Date().toISOString(),
+        status: "pending",
+        razorpay_payment_id: paymentLink.id,
       });
 
+    // --- 7. Return checkout URL ---
     return Response.json({
       success: true,
-      plan: plan_id,
-      expires_at: expiresAt,
+      checkout_url: paymentLink.short_url,
+      payment_link_id: paymentLink.id,
+      plan: planId,
       amount_inr: plan.price_inr,
-      message: `Subscription activated: ${plan.name} (₹${plan.price_inr}/year). You are now listed in the marketplace.`,
-      // In production: would return { payment_url: subscription.short_url } for Razorpay checkout
+      message: "Complete payment at the checkout URL to activate your subscription.",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error("Server error:", err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });
