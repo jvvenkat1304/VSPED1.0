@@ -311,13 +311,13 @@ async function handleProposalPayment(paymentId: string, proposalId: string) {
       status: "paid",
       paid_at: new Date().toISOString(),
     })
-    .eq("id", proposalPayment.proposal_id);
+    .eq("id", proposalId);
 
   // Notify the educator that payment was received
   const { data: proposal } = await supabaseAdmin
     .from("session_proposals")
     .select("educator_id, total_sessions, proposed_rate_inr")
-    .eq("id", proposalPayment.proposal_id)
+    .eq("id", proposalId)
     .single();
 
   if (proposal) {
@@ -329,13 +329,27 @@ async function handleProposalPayment(paymentId: string, proposalId: string) {
         title: "Payment Received",
         body: `Payment confirmed for ${proposal.total_sessions} sessions. Sessions are now active.`,
         metadata: {
-          proposal_id: proposalPayment.proposal_id,
+          proposal_id: proposalId,
           payment_id: paymentId,
         },
       });
   }
 
-  console.log(`Payment captured for proposal: ${proposalPayment.proposal_id}`);
+  console.log(`Payment captured for proposal: ${proposalId}`);
+
+  // Trigger session generation after payment is captured
+  try {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/generate-sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({ proposal_id: proposalId }),
+    });
+  } catch (genErr) {
+    console.error("Failed to trigger session generation:", genErr);
+  }
 }
 
 /**
@@ -433,4 +447,18 @@ async function captureProposalPayment(paymentRecordId: string, proposalId: strin
   }
 
   console.log(`Payment link paid — proposal marked as paid: ${proposalId}`);
+
+  // Trigger session generation after payment is captured
+  try {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/generate-sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({ proposal_id: proposalId }),
+    });
+  } catch (genErr) {
+    console.error("Failed to trigger session generation:", genErr);
+  }
 }

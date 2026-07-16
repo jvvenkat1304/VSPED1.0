@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
     }
 
     // Only allow payment for accepted proposals
-    if (proposal.status !== "accepted") {
+    if (!['accepted', 'parent_accepted'].includes(proposal.status)) {
       return Response.json(
         { success: false, message: "Proposal must be accepted before payment" },
         { status: 422 }

@@ -93,6 +93,7 @@ export default function OtpVerifyPage() {
         await useAuthStore.getState().setAuth(
           data.user_id,
           data.session_token,
+          data.refresh_token || '',
           data.role || 'parent'
         );
 

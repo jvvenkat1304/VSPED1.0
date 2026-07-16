@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 const Colors = {
   background: '#f9f7f1',
@@ -90,6 +91,20 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
 
   useEffect(() => {
     fetchProposals();
+  }, [fetchProposals]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProposals();
+    }, [fetchProposals])
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProposals();
+    }, 30_000);
+
+    return () => clearInterval(interval);
   }, [fetchProposals]);
 
   // Group proposals by status category

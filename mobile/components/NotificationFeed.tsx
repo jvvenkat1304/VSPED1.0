@@ -7,6 +7,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from 'react-native';
+import { router } from 'expo-router';
 import { createClient } from '@supabase/supabase-js';
 import { Colors, Fonts, Spacing, BorderRadius } from '../constants/theme';
 
@@ -72,6 +73,15 @@ export default function NotificationFeed({ sessionToken }: NotificationFeedProps
     fetchNotifications();
   }, [sessionToken]);
 
+  useEffect(() => {
+    // Poll every 30 seconds for new notifications
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30_000);
+
+    return () => clearInterval(interval);
+  }, [sessionToken]);
+
   async function fetchNotifications() {
     setLoading(true);
     try {
@@ -127,13 +137,30 @@ export default function NotificationFeed({ sessionToken }: NotificationFeedProps
     if (!notification.read_at) {
       markAsRead(notification.id);
     }
-    // Navigation to proposal can be added later using metadata.proposal_id
+
+    // Navigate based on notification type and metadata
+    const proposalId = notification.metadata?.proposal_id;
+
+    if (proposalId) {
+      // For proposal-related notifications, navigate to proposals view
+      router.push('/dashboard/parent');
+      return;
+    }
+
+    if (notification.type === 'consent_granted') {
+      // Navigate educator to their clients view
+      router.push('/dashboard/educator');
+      return;
+    }
+
+    // No recognizable target — just mark as read (already done above)
   }
 
   // --- Render ---
 
   function renderNotificationItem({ item }: { item: Notification }) {
     const isUnread = !item.read_at;
+    const isConsentNotification = item.type === 'consent_granted';
 
     return (
       <Pressable
@@ -147,9 +174,14 @@ export default function NotificationFeed({ sessionToken }: NotificationFeedProps
           <Text style={[styles.notificationTitle, isUnread && styles.notificationTitleUnread]}>
             {item.title}
           </Text>
-          <Text style={styles.notificationBody} numberOfLines={2}>
+          <Text style={styles.notificationBody} numberOfLines={3}>
             {item.body}
           </Text>
+          {isConsentNotification && item.metadata?.consent_scope && (
+            <Text style={styles.consentScopeText}>
+              📋 Scope: {(item.metadata.consent_scope as string[]).join(', ')}
+            </Text>
+          )}
           <Text style={styles.notificationTimestamp}>
             {getRelativeTime(item.created_at)}
           </Text>
@@ -266,6 +298,13 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     lineHeight: 18,
     marginBottom: 6,
+  },
+  consentScopeText: {
+    fontSize: 12,
+    color: Colors.primary,
+    marginTop: 4,
+    marginBottom: 4,
+    fontStyle: 'italic',
   },
   notificationTimestamp: {
     fontSize: Fonts.sizes.xs,

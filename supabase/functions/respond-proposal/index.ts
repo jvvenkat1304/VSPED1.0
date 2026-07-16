@@ -235,6 +235,26 @@ async function handleAccept(
     console.error("Failed to insert notification:", notifError.message);
   }
 
+  // Insert notification for educator confirming consent was granted
+  const { error: educatorNotifError } = await supabaseAdmin
+    .from("notifications")
+    .insert({
+      user_id: educatorId,
+      type: "consent_granted",
+      title: "Consent Granted",
+      body: "You now have time-bound access to the child's data for session planning and progress notes. View details in My Clients.",
+      metadata: {
+        proposal_id: proposal.id,
+        child_id: proposal.child_id,
+        consent_grant_id: consentGrant.id,
+        consent_scope: ["progress", "session_notes"],
+      },
+    });
+
+  if (educatorNotifError) {
+    console.error("Failed to insert educator consent notification:", educatorNotifError.message);
+  }
+
   return Response.json(
     {
       success: true,

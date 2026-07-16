@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Linking,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 
 const BASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co/functions/v1';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
@@ -129,6 +130,20 @@ export default function ParentProposalsView({ sessionToken }: ParentProposalsVie
 
   useEffect(() => {
     fetchProposals();
+  }, [fetchProposals]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProposals();
+    }, [fetchProposals])
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProposals();
+    }, 30_000);
+
+    return () => clearInterval(interval);
   }, [fetchProposals]);
 
   const onRefresh = useCallback(() => {

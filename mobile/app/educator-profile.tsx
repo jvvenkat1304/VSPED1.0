@@ -26,6 +26,7 @@ export default function EducatorProfileScreen() {
     verification_status: string;
     bio: string;
     city: string;
+    schedule_config: string;
   }>();
 
   const name = params.name || 'Educator';
@@ -35,6 +36,7 @@ export default function EducatorProfileScreen() {
   const verificationStatus = params.verification_status || '';
   const bio = params.bio || '';
   const city = params.city || '';
+  const scheduleConfig = params.schedule_config ? JSON.parse(params.schedule_config) : null;
 
   const [showProposal, setShowProposal] = useState(false);
 
@@ -109,6 +111,31 @@ export default function EducatorProfileScreen() {
             <Text style={styles.bioText}>{bio}</Text>
           </View>
         ) : null}
+
+        {/* Availability Section */}
+        <View style={styles.infoCard}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Availability</Text>
+            {scheduleConfig?.available_days?.length > 0 ? (
+              <>
+                <View style={styles.chipContainer}>
+                  {scheduleConfig.available_days.map((day: string) => (
+                    <View key={day} style={styles.chip}>
+                      <Text style={styles.chipText}>{day}</Text>
+                    </View>
+                  ))}
+                </View>
+                {scheduleConfig.session_start_time && (
+                  <Text style={[styles.infoValue, { marginTop: 8 }]}>
+                    🕐 Sessions at {scheduleConfig.session_start_time}
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text style={styles.infoValue}>Schedule not set</Text>
+            )}
+          </View>
+        </View>
       </ScrollView>
 
       {/* Sticky Bottom Action */}

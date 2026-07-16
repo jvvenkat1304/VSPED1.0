@@ -36,6 +36,7 @@ interface Educator {
   verification_status: 'provisionally_verified' | 'verified';
   bio: string;
   city: string;
+  schedule_config: { available_days?: string[]; session_start_time?: string } | null;
 }
 
 export default function SearchScreen() {
@@ -60,7 +61,7 @@ export default function SearchScreen() {
       // verification_status IN ('provisionally_verified', 'verified') AND subscription_status = 'active'
       const { data: profiles, error } = await supabase
         .from('educator_profiles')
-        .select('id, rci_number, subjects, languages, city, session_rate_inr, verification_status, bio');
+        .select('id, rci_number, subjects, languages, city, session_rate_inr, verification_status, bio, schedule_config');
 
       if (error) {
         console.error('Error fetching educators:', error.message);
@@ -109,6 +110,7 @@ export default function SearchScreen() {
         verification_status: p.verification_status,
         bio: p.bio || '',
         city: p.city || '',
+        schedule_config: p.schedule_config || null,
       }));
 
       setEducators(mapped);
@@ -197,6 +199,7 @@ export default function SearchScreen() {
                   verification_status: item.verification_status,
                   bio: item.bio,
                   city: item.city,
+                  schedule_config: JSON.stringify(item.schedule_config),
                 },
               })}
             >

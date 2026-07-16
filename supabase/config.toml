@@ -168,3 +168,9 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/create-video-session/deno.json"
 entrypoint = "./functions/create-video-session/index.ts"
+
+[functions.generate-sessions]
+enabled = true
+verify_jwt = false
+import_map = "./functions/generate-sessions/deno.json"
+entrypoint = "./functions/generate-sessions/index.ts"

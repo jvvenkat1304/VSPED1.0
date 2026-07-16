@@ -13,13 +13,16 @@ interface Child {
 interface AuthState {
   userId: string | null;
   sessionToken: string | null;
+  refreshToken: string | null;
   role: string | null;
   children: Child[];
   isLoading: boolean;
+  isRefreshing: boolean;
 
   // Actions
-  setAuth: (userId: string, sessionToken: string, role?: string) => Promise<void>;
+  setAuth: (userId: string, sessionToken: string, refreshToken: string, role?: string) => Promise<void>;
   loadFromSecureStore: () => Promise<void>;
+  refreshSession: () => Promise<boolean>;
   fetchChildren: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -27,15 +30,18 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   userId: null,
   sessionToken: null,
+  refreshToken: null,
   role: null,
   children: [],
   isLoading: true,
+  isRefreshing: false,
 
-  setAuth: async (userId, sessionToken, role) => {
+  setAuth: async (userId, sessionToken, refreshToken, role) => {
     await SecureStore.setItemAsync('user_id', userId);
     await SecureStore.setItemAsync('session_token', sessionToken);
+    await SecureStore.setItemAsync('refresh_token', refreshToken);
     if (role) await SecureStore.setItemAsync('role', role);
-    set({ userId, sessionToken, role: role || get().role });
+    set({ userId, sessionToken, refreshToken, role: role || get().role });
     // After auth is set, fetch children
     get().fetchChildren();
   },
@@ -44,14 +50,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const userId = await SecureStore.getItemAsync('user_id');
       const sessionToken = await SecureStore.getItemAsync('session_token');
+      const refreshToken = await SecureStore.getItemAsync('refresh_token');
       const role = await SecureStore.getItemAsync('role');
-      set({ userId, sessionToken, role, isLoading: false });
+      set({ userId, sessionToken, refreshToken, role, isLoading: false });
+
+      // If we have a refresh token, attempt refresh on launch for a fresh access token
+      if (refreshToken) {
+        await get().refreshSession();
+      }
       // If we have a session, fetch children
-      if (sessionToken) {
+      if (get().sessionToken) {
         get().fetchChildren();
       }
     } catch {
       set({ isLoading: false });
+    }
+  },
+
+  refreshSession: async () => {
+    const { refreshToken, isRefreshing } = get();
+    if (!refreshToken || isRefreshing) return false;
+
+    set({ isRefreshing: true });
+    try {
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+
+      if (error || !data.session) {
+        // Unrecoverable — force logout
+        await get().logout();
+        return false;
+      }
+
+      const newAccess = data.session.access_token;
+      const newRefresh = data.session.refresh_token;
+
+      await SecureStore.setItemAsync('session_token', newAccess);
+      await SecureStore.setItemAsync('refresh_token', newRefresh);
+      set({ sessionToken: newAccess, refreshToken: newRefresh, isRefreshing: false });
+      return true;
+    } catch {
+      set({ isRefreshing: false });
+      return false;
     }
   },
 
@@ -109,8 +149,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     await SecureStore.deleteItemAsync('user_id');
     await SecureStore.deleteItemAsync('session_token');
+    await SecureStore.deleteItemAsync('refresh_token');
     await SecureStore.deleteItemAsync('has_pin');
     await SecureStore.deleteItemAsync('role');
-    set({ userId: null, sessionToken: null, role: null, children: [], isLoading: false });
+    set({ userId: null, sessionToken: null, refreshToken: null, role: null, children: [], isLoading: false, isRefreshing: false });
   },
 }));

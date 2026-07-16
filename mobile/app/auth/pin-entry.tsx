@@ -57,7 +57,7 @@ export default function PinEntryPage() {
         // Update global auth store with the verified session
         const sessionToken = data.session_token || session_token || '';
         const userRole = data.role || role || 'parent';
-        await useAuthStore.getState().setAuth(user_id || '', sessionToken, userRole);
+        await useAuthStore.getState().setAuth(user_id || '', sessionToken, data.refresh_token || '', userRole);
         // PIN verified — navigate based on role
         if (userRole === 'special_educator') {
           router.replace('/dashboard/educator');
