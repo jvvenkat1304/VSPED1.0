@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
+import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
   primary: '#2c5272',
@@ -9,6 +10,9 @@ const Colors = {
 };
 
 export default function DashboardLayout() {
+  const role = useAuthStore(state => state.role);
+  const isEducator = role === 'special_educator';
+
   return (
     <Tabs
       screenOptions={{
@@ -28,13 +32,26 @@ export default function DashboardLayout() {
         },
       }}
     >
+      {/* Parent tabs */}
       <Tabs.Screen
         name="parent"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏠</Text>,
+          href: isEducator ? null : '/dashboard/parent',
         }}
       />
+
+      {/* Educator tab — shown as Home for educators */}
+      <Tabs.Screen
+        name="educator"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏠</Text>,
+          href: isEducator ? '/dashboard/educator' : null,
+        }}
+      />
+
       <Tabs.Screen
         name="classroom"
         options={{
@@ -42,13 +59,17 @@ export default function DashboardLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>📚</Text>,
         }}
       />
+
       <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🔍</Text>,
+          // Educators don't need search (they are the ones being searched)
+          href: isEducator ? null : '/dashboard/search',
         }}
       />
+
       <Tabs.Screen
         name="calendar"
         options={{
@@ -56,17 +77,14 @@ export default function DashboardLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>📅</Text>,
         }}
       />
+
       <Tabs.Screen
         name="games"
         options={{
           title: 'Games',
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🎮</Text>,
-        }}
-      />
-      <Tabs.Screen
-        name="educator"
-        options={{
-          href: null,  // Hide from tabs — educator has own layout
+          // Only parents see games tab
+          href: isEducator ? null : '/dashboard/games',
         }}
       />
     </Tabs>

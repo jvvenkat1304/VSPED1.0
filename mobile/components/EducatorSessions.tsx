@@ -9,6 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { createClient } from '@supabase/supabase-js';
+import VideoSession from './VideoSession';
 
 const SUPABASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
@@ -33,9 +34,8 @@ interface EducatorSessionsProps {
 
 interface Session {
   id: string;
-  scheduled_at: string;
+  start_time: string;
   status: string;
-  duration_minutes: number | null;
   child_name: string | null;
   consent_active: boolean;
 }
@@ -55,6 +55,7 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
+  const [activeVideoSessionId, setActiveVideoSessionId] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -64,8 +65,8 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
 
       const { data, error } = await supabase
         .from('sessions')
-        .select('id, scheduled_at, status, duration_minutes, child_id')
-        .order('scheduled_at', { ascending: true });
+        .select('id, start_time, status, child_id')
+        .order('start_time', { ascending: true });
 
       if (error) {
         console.error('Error fetching sessions:', error.message);
@@ -86,9 +87,9 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
       if (childIds.length > 0) {
         const { data: consents } = await supabase
           .from('consent_grants')
-          .select('child_id, status')
+          .select('child_id')
           .in('child_id', childIds)
-          .eq('status', 'active');
+          .is('revoked_at', null);
 
         if (consents) {
           consents.forEach((c) => {
@@ -99,10 +100,9 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
 
       const mapped: Session[] = data.map((s) => ({
         id: s.id,
-        scheduled_at: s.scheduled_at,
+        start_time: s.start_time,
         status: s.status || 'proposed',
-        duration_minutes: s.duration_minutes || 60,
-        child_name: consentMap[s.child_id] ? null : null, // Name only available via consent-checked API
+        child_name: consentMap[s.child_id] ? null : null,
         consent_active: consentMap[s.child_id] || false,
       }));
 
@@ -127,10 +127,10 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
 
   const now = new Date();
   const upcomingSessions = sessions.filter(
-    (s) => new Date(s.scheduled_at) >= now && s.status !== 'completed' && s.status !== 'cancelled'
+    (s) => new Date(s.start_time) >= now && s.status !== 'completed' && s.status !== 'cancelled'
   );
   const pastSessions = sessions.filter(
-    (s) => new Date(s.scheduled_at) < now || s.status === 'completed' || s.status === 'cancelled'
+    (s) => new Date(s.start_time) < now || s.status === 'completed' || s.status === 'cancelled'
   );
 
   const displayedSessions = activeTab === 'upcoming' ? upcomingSessions : pastSessions;
@@ -197,7 +197,27 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
         }
       >
-        {displayedSessions.length === 0 ? (
+        {/* Video Session overlay */}
+        {activeVideoSessionId && (
+          <View style={styles.videoOverlay}>
+            <Pressable
+              style={styles.videoBackBtn}
+              onPress={() => setActiveVideoSessionId(null)}
+            >
+              <Text style={styles.videoBackText}>← Back to Sessions</Text>
+            </Pressable>
+            <VideoSession
+              sessionId={activeVideoSessionId}
+              sessionToken={sessionToken}
+              onEnd={() => {
+                setActiveVideoSessionId(null);
+                fetchSessions();
+              }}
+            />
+          </View>
+        )}
+
+        {!activeVideoSessionId && displayedSessions.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>📅</Text>
             <Text style={styles.emptyTitle}>
@@ -209,12 +229,12 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
                 : 'Completed sessions will appear here.'}
             </Text>
           </View>
-        ) : (
+        ) : !activeVideoSessionId ? (
           displayedSessions.map((session) => (
             <View key={session.id} style={styles.sessionCard}>
               <View style={styles.cardTop}>
                 <View style={styles.dateSection}>
-                  <Text style={styles.dateText}>{formatDateTime(session.scheduled_at)}</Text>
+                  <Text style={styles.dateText}>{formatDateTime(session.start_time)}</Text>
                   <Text style={styles.durationText}>
                     ⏱ {session.duration_minutes || 60} min
                   </Text>
@@ -228,9 +248,24 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
                   {session.consent_active ? 'Client' : 'Client (consent pending)'}
                 </Text>
               </View>
+
+              {/* Start/Join Session button for accepted or in_progress sessions */}
+              {(session.status === 'accepted' || session.status === 'in_progress') && (
+                <Pressable
+                  style={[
+                    styles.videoButton,
+                    session.status === 'in_progress' && styles.videoButtonActive,
+                  ]}
+                  onPress={() => setActiveVideoSessionId(session.id)}
+                >
+                  <Text style={styles.videoButtonText}>
+                    {session.status === 'in_progress' ? '🟢 Rejoin Session' : '🎥 Start Session'}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           ))
-        )}
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -375,5 +410,34 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
     fontWeight: '500',
+  },
+
+  // Video Session
+  videoButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  videoButtonActive: {
+    backgroundColor: Colors.success,
+  },
+  videoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  videoOverlay: {
+    paddingBottom: 20,
+  },
+  videoBackBtn: {
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  videoBackText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });

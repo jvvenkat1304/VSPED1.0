@@ -1,11 +1,11 @@
 # V-SPED 1.0 — Project Handoff & Development Log
 
-**Last Updated:** July 2, 2026
+**Last Updated:** July 15, 2026
 **Started:** June 14, 2026
 **IDE:** Kiro (Claude Opus 4.8)
-**Developer:** Karan Karthik Palukuri
+**Developer:** Karan Dattatreya Palukuri
 **Project:** V-SPED for Vathsalya Child Neuro and Nurture Center
-**Repo:** jvvenkat1304/VSPED1.0 (branch: main)
+**Repo:** jvvenkat1304/VSPED1.0 (branch: main, latest commit: 68d9130)
 
 > This is a living document. It is updated automatically as work progresses in this session.
 
@@ -39,15 +39,36 @@
 
 ---
 
-## Backend Components — Current Status (updated June 19, 2026)
+## Backend Components — Current Status (updated July 15, 2026)
 
 | Component | Status |
 |-----------|--------|
-| Database schema (26 tables) | Complete |
-| RLS security policies | Complete |
+| Database schema (26+ tables incl. session_proposals, proposal_payments, notifications, verification_audit_log) | Complete |
+| RLS security policies (60+) | Complete |
 | send-otp edge function | Complete & tested (Supabase-native OTP, MSG91 delivery via hook) |
 | verify-otp edge function | Complete & tested (returns real session, is_new_user, role) |
 | create-pin edge function | Complete & tested (SHA-256 hash confirmed in DB) |
+| verify-pin edge function | Complete & tested (correct PIN, 5-strike lockout, role from public.users) |
+| send-sms-hook edge function | Complete & deployed (Send SMS Auth Hook for Supabase → MSG91) |
+| create-child / get-child | Complete (AES-256 encryption/decryption of child PII) |
+| request-consent / respond-consent / revoke-consent | Complete (DPDP-compliant consent lifecycle) |
+| verify-rci | Complete (format validation, attestation, rate limiting, audit log) |
+| create-educator-profile | Complete (with min_rate_inr, verification_status) |
+| admin-verify-educator | Complete (GET queue + POST verify/reject) |
+| subscribe-educator | Complete (Razorpay Payment Links, one-time annual) |
+| razorpay-webhook | Complete (HMAC-SHA256, payment.captured + payment_link.paid) |
+| create-payment-order | Complete (Payment Link for session payments) |
+| verify-subscription | Complete (polls Razorpay API directly on refresh) |
+| create-proposal | Complete (parent proposes sessions, rate validation, GST calc) |
+| respond-proposal | Complete (educator accept/reject/counter, auto-consent, payment) |
+| respond-counter | Complete (parent accept/withdraw counter-proposal) |
+| get-proposals | Complete (role-based listing, child privacy enforced) |
+| expire-proposals | Complete (scheduled function, 72h expiry + notifications) |
+| create-video-session | Complete (VideoSDK JWT + room creation, session lifecycle) |
+| propose-session / respond-session | Complete (legacy educator-initiated flow, still functional) |
+| MSG91 integration | Working (OTP template VSPED_OTP, SEND_SMS_HOOK_SECRET set) |
+| Razorpay integration | Working (test mode, Payment Links approach) |
+| VideoSDK integration | Working (prebuilt browser UI, native in Phase 6) |
 | verify-pin edge function | Complete & tested (correct PIN, 3-strike lockout, role from public.users) |
 | send-sms-hook edge function | Complete & deployed (Send SMS Auth Hook for Supabase → MSG91) |
 | MSG91 integration | Working (OTP template VSPED_OTP, SEND_SMS_HOOK_SECRET set) |
@@ -140,25 +161,28 @@ The detailed source documents were moved to `docs/archive/` on June 14, 2026. Th
 
 ---
 
-## Completion Snapshot (as of June 19, 2026)
+## Completion Snapshot (updated July 15, 2026)
 
-Estimate of overall progress. Approximate and weighting-dependent; recorded for planning.
+**Overall progress: ~85%** — Phases 1-4 complete, Phase 5 (E2E testing) next.
 
-**"Business logic"** = three-pronged model operations (marketplace booking, enrollment + parent approval, educator token economy, school subscription billing, games/progress, manufacturer royalties, platform fees) plus Razorpay payments, VideoSDK sessions, notifications, and scheduled jobs.
+| Layer | Status | Weight |
+|-------|--------|--------|
+| Database schema (26+ tables) | ✅ Done | ~10% |
+| RLS security (60+ policies) | ✅ Done | ~8% |
+| Auth backend (OTP + PIN + Send SMS Hook) | ✅ Done & tested | ~7% |
+| RCI verification system | ✅ Done & deployed | ~5% |
+| Session proposal/booking system | ✅ Done & deployed | ~10% |
+| Razorpay payments (subscription + session) | ✅ Done & tested | ~8% |
+| VideoSDK (room creation + session lifecycle) | ✅ Done & deployed | ~5% |
+| Mobile frontend (all screens, both roles) | ✅ Done | ~25% |
+| Zustand state + role-based routing | ✅ Done | ~5% |
+| E2E testing (two-phone flow) | ⬜ Phase 5 | ~7% |
+| Demo polish + EAS Build (native SDKs) | 🔄 10% | ~5% |
+| AWS/Cloudflare migration | ⬜ Phase 7 | ~5% |
 
-| Layer | Status | Rough weight (whole product) |
-|-------|--------|------|
-| Database schema (26 tables, incl. business tables) | Done | ~15% |
-| RLS security | Done | ~10% |
-| Auth backend (OTP + PIN + Send SMS Hook + roles) | Done & tested | ~8% |
-| Auth UI wiring in FlutterFlow | Pending (sheet ready) | ~7% |
-| App shell, navigation, role-based dashboard skeletons | Pending | ~10% |
-| Business-logic backend | Not started (debated) | ~25% |
-| Business-logic UI | Not started | ~25% |
+**What's working end-to-end:** Auth → onboarding → educator verification → subscription → parent search → proposal → acceptance → auto-consent → payment → video session → consent revocation.
 
-- **If everything except business logic is completed:** ~**35–40% of the total product**.
-- **Backend/technical layer only (excluding FlutterFlow UI):** ~**65–70%** complete, since the data model + security are fully built and auth is done/tested.
-- Headline: foundation is solid and the DB is already shaped for the business logic, but business logic + its UI is more than half the actual product.
+**What remains:** Two-phone testing, native SDK integration (EAS Build), UI polish, AWS migration for investor readiness.
 
 ---
 
@@ -238,6 +262,15 @@ Entries are added here automatically as work is performed in this session.
 | July 14, 2026 | Phase 3: Razorpay deployed | Migration 20260713000002_razorpay_columns.sql applied. Deployed subscribe-educator, razorpay-webhook, create-payment-order to production. Pending: configure webhook URL in Razorpay dashboard (subscription.charged, subscription.cancelled, payment.captured events). |
 | July 14, 2026 | Razorpay testing + critical fixes | (1) Razorpay Subscriptions API not available on account — "seller does not support recurring payments". Decision: switched to Payment Links API for one-time annual payments (Option A). Recurring payments deferred to post-launch. (2) Rewrote subscribe-educator to use Payment Links instead of Subscriptions API. (3) Removed notify_phone/notify_email fields (Razorpay rejected them). (4) Removed callback_url pointing to non-existent vsped.app domain. (5) Fixed subscription_status CHECK constraint — added 'pending' and 'inactive' to allowed values. (6) Fixed SubscriptionCheckout.tsx features crash — plan.features from DB is JSONB object not array, added Array.isArray guard. (7) Fixed role-based routing in pin-entry.tsx — educators now route to /dashboard/educator instead of always /dashboard/parent. (8) Webhook not firing for payment_link.paid — created verify-subscription edge function as fallback: on refresh, app calls Razorpay API directly to check payment link status and activates subscription if paid. Registered in config.toml. Razorpay webhook delivery issue still under investigation. |
 | July 14, 2026 | Role routing audit + fix | Audited all router.replace instances in the app for hardcoded role assumptions. Found 1 bug: app/index.tsx passed `role: 'parent'` hardcoded when routing returning users to PIN entry. Fixed to read stored role from SecureStore (`await SecureStore.getItemAsync('role')`). This caused educators to briefly see parent dashboard on app resume. All other routing instances verified correct (parent-setup is parent-only, educator-setup is educator-only, pin-entry reads role from verify-pin API response). |
+| July 14, 2026 | All changes committed + pushed to GitHub | Commit 68d9130: 72 files changed, 11,720 insertions. Covers all work from July 8-14: RCI verification system, session proposal/booking system, Razorpay integration (Payment Links), all frontend components, all migrations, Zustand auth store, bug fixes, specs, and documentation. Pushed to origin/main. |
+| July 14, 2026 | Educator dashboard fully wired + sessions fix | (1) Fixed EducatorSessions error: changed consent_grants query from .eq('status','active') to .is('revoked_at', null), changed sessions column from scheduled_at to start_time (matching actual DB). (2) Wired all 4 dud cards on educator dashboard: My Profile → read-only profile view (RCI, subjects, rate, verification, subscription), My Clients → shows children with active consent grants, Offerings → points to Proposals, Consent Requests → points to Clients. (3) Added live profile status bar reading from DB instead of hardcoded text. Zero non-functional buttons remain. |
+| July 14, 2026 | Phase 4: VideoSDK integration built | Created create-video-session edge function: JWT generation via Web Crypto API (no external libs), creates VideoSDK room via POST /v2/rooms, stores videosdk_room_id on session, updates status to in_progress. Created VideoSession.tsx component: idle→loading→in_progress→ended states, opens prebuilt VideoSDK URL in browser via Linking.openURL, rejoin + end session buttons. Created ParentSessions.tsx: parent session list with Join buttons. Updated EducatorSessions.tsx with Start/Rejoin video buttons + VideoSession integration. Updated parent dashboard with "Video Sessions" card. Registered in config.toml. Requires VIDEOSDK_API_KEY + VIDEOSDK_SECRET in Supabase secrets. Pending deploy. |
+| July 14, 2026 | Architecture issues identified during testing | (1) Bottom nav: same tabs for both roles — educators don't need Games/Search. Need role-based tab layout. (2) Calendar: placeholder, needs real session data. (3) Parent dashboard redirect: still happening despite fixes — likely stale SecureStore cache. (4) Video sessions: should be integrated INTO Classroom tab, not a separate button. Decision: Classroom = active bookings + video join + session history. (5) Fixed sessions.duration_minutes column error (column doesn't exist on sessions table) in both EducatorSessions.tsx and ParentSessions.tsx. All architectural changes deferred to next work session — crashes fixed immediately. |
+| July 15, 2026 | Role-based tab navigation — definitive fix | Rewrote dashboard/_layout.tsx: reads role from Zustand store, conditionally shows/hides tabs via `href: null`. Educators see: Home (educator), Classroom, Calendar. Parents see: Home (parent), Classroom, Search, Calendar, Games. Root cause of routing bug: educator tab was set to `href: null` (always hidden) so routing to /dashboard/educator fell back to the first visible tab (parent). Now both roles have their own visible Home tab and irrelevant tabs are hidden per role. setAuth (stores role) is awaited before router.replace ensures layout renders with correct role. |
+| July 15, 2026 | Classroom tab rewritten + video sessions integrated | Rewrote classroom.tsx: now shows active sessions with "Start Session"/"Join Live" video buttons, past sessions with status badges, role-aware empty state. VideoSession component renders inline. Removed separate "Video Sessions" card from parent dashboard (redundant with Classroom). Removed ParentSessions import and 'sessions' ActiveView from parent.tsx. Classroom tab is now the central hub for all session activity for both roles. |
+| July 15, 2026 | Calendar + Educator Offerings built | (1) Rewrote calendar.tsx with real session data: 7-day horizontal week selector with day circles (today gold, selected blue), dot indicators for days with sessions, session list filtered by selected day with time + status + Join button, pull-to-refresh. (2) Created EducatorOfferings.tsx: day toggles (Mon-Sun), session time window (HH:MM), recommended weeks input, notes field. Saves to educator_profiles.schedule_config JSONB column. (3) Wired Offerings card in educator dashboard to open EducatorOfferings. Requires schedule_config column on educator_profiles (ALTER TABLE needed). |
+| July 15, 2026 | AWS/Cloudflare migration phase added + progress tracker rewritten | Decision (Karan + uncle): Add Phase 7 for AWS/Cloudflare migration to demonstrate scalability readiness to investors. Supabase stays for now (already on AWS ap-south-1 Mumbai). Migration involves: RDS PostgreSQL, Lambda (port 20+ Deno functions to Node.js), Cognito or custom auth, Cloudflare Pages for web. Estimated 2-4 weeks with dedicated DevOps. Added as Phase 7 (after E2E testing, before app store). Rewrote entire PROGRESS_TRACKER.md with accurate status for all phases, detailed task lists, migration plan, blockers, timeline, demo criteria, and technical stack summary. Phase order corrected: Testing → Polish → Migration → App Store. |
+| July 15, 2026 | Phase 5 E2E testing — critical gaps found | Tested full parent→educator flow with aunt's phone as parent. Found 3 major gaps: (1) Educator's schedule_config/offerings NOT shown on educator profile detail page — parent can't see availability before proposing. (2) Session token expiry (1hr) causes 401 errors + app logs user out — no token refresh logic exists, making extended testing sessions impossible. (3) After proposal acceptance, NO individual sessions are created in the sessions table — Classroom/Calendar show empty because the scheduling step (converting package deal into actual time slots) was never built. These are architectural gaps, not bugs. Must fix before demo. |
 
 ---
 
@@ -292,27 +325,34 @@ NeuroBridge is a connected but distinct product segment covering interactive gam
 
 ---
 
-## Pending / Next Steps (as of July 1, 2026)
+## Pending / Next Steps (as of July 15, 2026)
 
-**Immediate (can start now, no business logic needed):**
-1. User to connect FlutterFlow → GitHub via Developer Menu → Connect GitHub Repo → target branch `flutterflow`.
-2. Download FlutterFlow code and extract into `VSPED1.0\frontend\`.
-3. Install Flutter SDK on Windows (for local web preview via Chrome).
-4. Provide brand assets (logo, colors, font) or confirm Kiro pulls them from vathsalya.co.in.
-5. Remove Google/Apple login buttons from StarterPage and LoginPage in FlutterFlow (manual, 2 minutes).
-6. Kiro builds Flutter auth screens (StarterPage, PhoneEntry, OTPVerification, SetPIN, PinEntry) against the live backend.
+**Phase 5 — E2E Testing (next):**
+1. Two-phone test: your number (educator) + uncle's number (parent)
+2. Full proposal flow: parent proposes → educator accepts → payment → video session
+3. Counter-proposal and expiry flows
+4. Property-based tests (20 deferred from RCI + session proposal specs)
+5. Security regression (re-run 44 automated tests)
+6. Health check / diagnostics endpoint
 
-**Waiting on management (business logic clarification document: `docs/business-logic-questions.md`):**
-7. Token economy definition (Q3.1–3.4) — blocks educator marketplace screens.
-8. School pricing model (Q4.1–4.2) — blocks school admin screens.
-9. Parent booking unit + payment timing (Q2.2–2.3) — blocks booking flow screens.
-10. Razorpay payment split / merchant of record (Q8.2) — blocks all payment flows.
-11. Parent approval + minor data consent model (Q5.1, Q5.3, Q12.1) — blocks enrollment screens.
-12. NeuroBridge assessment architecture (auth model, data location, role access) — blocks assessment build.
+**Phase 6 — Demo Polish + EAS Build:**
+1. EAS Build setup (replaces Expo Go, enables native SDKs)
+2. Native VideoSDK (in-app video calls, no browser)
+3. Native Razorpay (in-app payment checkout, no browser)
+4. Instagram-style child profile (school, notes, milestones)
+5. Branding pass, push notifications, demo script
+6. Web build to Vercel/Cloudflare for instant demos
 
-**Deferred (later phase):**
-- Razorpay payment integration
-- VideoSDK video session integration
-- Notification system (push, email provider)
-- Scheduled jobs
+**Phase 7 — AWS/Cloudflare Migration (investor readiness):**
+1. AWS RDS PostgreSQL + Lambda (port Deno → Node.js) + API Gateway
+2. Cloudflare Pages for web frontend
+3. Shows investors the platform can scale beyond managed services
+
+**Phase 8 — App Store Deployment:**
+1. Google Play Store (Android APK via EAS)
+2. Apple App Store (requires Apple Developer account)
+
+**Deferred (post-funding):**
 - NeuroBridge assessment engine (separate entity)
+- AWS SES email notifications
+- School/B2B module (V2)

@@ -97,7 +97,7 @@ export default function ParentDashboard() {
         </Pressable>
 
         {/* My Proposals Card */}
-        <Pressable style={[styles.actionCard, styles.proposalsCard]} onPress={() => setActiveView('proposals')}>
+        <Pressable style={styles.actionCard} onPress={() => setActiveView('proposals')}>
           <Text style={styles.actionEmoji}>📋</Text>
           <Text style={styles.actionTitle}>My Proposals</Text>
           <Text style={styles.actionDesc}>Track session proposals & payments</Text>

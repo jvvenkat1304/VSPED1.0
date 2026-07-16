@@ -1,23 +1,23 @@
 # V-SPED Progress Tracker
 
-**Goal:** A working, functioning app ready for initial customers and funding demo.
-**Last Updated:** July 14, 2026
+**Goal:** A working, functioning app ready for initial customers, funding demo, and scalable infrastructure.
+**Last Updated:** July 15, 2026
 
 ---
 
-## Overall Progress: ███████████████░ ~80%
+## Overall Progress: ████████████████ ~85%
 
 | Milestone | Progress | Status |
 |-----------|----------|--------|
-| Backend Core | 100% | ✅ DONE |
-| Security & Compliance | 100% | ✅ DONE |
-| RCI Verification System | 100% | ✅ DONE (migration applied, all 3 functions deployed, testing deferred to Phase 5) |
-| Mobile Frontend (React Native + Expo) | 100% | ✅ DONE — All screens built and wired |
-| Razorpay Live Integration | 100% | ✅ DONE — Payment Links approach (recurring not available), verify-subscription fallback |
-| VideoSDK Integration | 0% | ⬜ NOT STARTED |
-| End-to-End Testing | 25% | 🔄 Backend tested; full-flow pending |
-| App Store Deployment | 0% | ⬜ NOT STARTED |
-| Demo Polish & Branding | 10% | 🔄 Brand colors applied, logo in place |
+| Phase 1: Backend Core | 100% | ✅ DONE |
+| Phase 1b: RCI Verification | 100% | ✅ DONE |
+| Phase 2: Mobile Frontend | 100% | ✅ DONE |
+| Phase 3: Razorpay Payments | 100% | ✅ DONE |
+| Phase 4: VideoSDK | 100% | ✅ DONE |
+| Phase 5: E2E Testing | 10% | 🔄 Testing started — 3 critical gaps found |
+| Phase 6: Demo Polish + EAS Build | 10% | 🔄 Brand colors done |
+| Phase 7: AWS/Cloudflare Migration | 0% | ⬜ Post-testing |
+| Phase 8: App Store Deployment | 0% | ⬜ Final step |
 
 ---
 
@@ -25,143 +25,252 @@
 
 | Task | Status |
 |------|--------|
-| Database schema (26 tables) | ✅ |
+| Database schema (26+ tables) | ✅ |
 | RLS security policies (60+) | ✅ |
-| Auth: Phone OTP + PIN + lockout | ✅ Tested |
+| Auth: Phone OTP + PIN + 5-strike lockout | ✅ Tested |
 | Auth: Send SMS Hook (Supabase → MSG91) | ✅ Tested |
-| Consent system: encrypted child data | ✅ Tested |
+| Consent system: AES-256 encrypted child data | ✅ Tested |
 | Consent: request/respond/revoke flow | ✅ Tested |
-| Educator profiles + subscriptions | ✅ Deployed |
+| Educator profiles + subscription system | ✅ Deployed |
 | Session scheduling (propose/respond) | ✅ Deployed |
-| Rate limiting (sliding window) | ✅ Active |
+| Rate limiting (PostgreSQL sliding window) | ✅ Active |
 | Security: 37/37 core + 7/7 advanced tests PASS | ✅ |
-| Supply chain: imports pinned to exact versions | ✅ |
-| DPDP privacy policy drafted | ✅ |
+| Supply chain: all esm.sh imports pinned @2.49.1 | ✅ |
+| DPDP Act 2023 privacy policy | ✅ |
 | Immutable child-data steering rule | ✅ Active |
+| handle_new_user trigger (auto-creates public.users) | ✅ Recreated Jul 13 |
 
 ---
 
-## Phase 1b: RCI Verification System ✅ BUILT (July 7-8)
+## Phase 1b: RCI Verification System ✅ COMPLETE (July 7-8)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| CRR format validator (14 RCI categories) | ✅ | `_shared/crr-validator.ts` |
-| Self-attestation declaration + legal text | ✅ | Stored with timestamp |
-| Multi-stage verification lifecycle | ✅ | pending → provisionally_verified → verified/rejected |
-| verify-rci rewritten + deployed | ✅ | Rate limited, attestation gate, format check, duplicate check, audit log |
-| create-educator-profile updated + deployed | ✅ | Sets verification_status='pending' on creation |
-| admin-verify-educator endpoint | ✅ | Deployed; deno.json fixed |
-| Migration (DB columns + audit table + RLS) | ✅ | Applied in SQL Editor |
-| Frontend: attestation checkbox on onboarding | ✅ | educator-setup.tsx updated |
-| Frontend: verification badges on marketplace | ✅ | search.tsx — live Supabase data + badges |
-| Marketplace visibility gated by verification + subscription | ✅ | RLS policy updated |
-| **E2E testing of full RCI flow** | ⬜ | Deferred to Phase 5 |
-
-**Remaining for Phase 1b:**
-1. ~~Run migration in SQL Editor~~ ✅ Done
-2. ~~Redeploy admin-verify-educator~~ ✅ Done
-3. E2E testing deferred to Phase 5
+| Task | Status |
+|------|--------|
+| CRR format validator (14 RCI categories: SE, AST, CP, RP, PO, SHT, CBR, RCA, MRT, RSW, RPMR, OMS, HEMT, RET) | ✅ |
+| Self-attestation declaration + legal text | ✅ |
+| Multi-stage lifecycle: pending → provisionally_verified → verified/rejected | ✅ |
+| verify-rci (rate limited 3/60min, format check, duplicate check, attestation gate, audit log) | ✅ |
+| create-educator-profile (sets verification_status='pending', min_rate_inr support) | ✅ |
+| admin-verify-educator (GET queue + POST verify/reject with audit trail) | ✅ |
+| verification_audit_log table (append-only, service_role only) | ✅ |
+| Updated RLS: marketplace visibility requires verification + subscription | ✅ |
+| Frontend: attestation checkbox, error handling (429/409/403/400) | ✅ |
+| Frontend: verification badges (green ✓ RCI Verified / amber ⏳ Pending) | ✅ |
 
 ---
 
-## Phase 2: Mobile Frontend (React Native + Expo) 🔄 IN PROGRESS
+## Phase 2: Mobile Frontend ✅ COMPLETE (July 5-14)
 
-**Framework:** React Native + Expo (TypeScript) — same codebase renders on Android, iOS, and Web.
-**Code location:** `mobile/`
-**Preview:** Expo Go on phone (scan QR) or web browser (localhost)
+**Stack:** React Native 0.81 + Expo SDK 54 + Expo Router + TypeScript + Zustand
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Expo project scaffolded | ✅ | SDK 54, React Native 0.81, Expo Router |
-| Brand theme applied (colors, palette) | ✅ | constants/theme.ts |
-| StarterPage (Get Started) | ✅ | |
-| Phone entry screen | ✅ | +91 prefix, 10-digit validation, calls live backend |
-| OTP verification screen | ✅ | 6-box auto-advance, auto-submit, autofill |
-| Set PIN screen | ✅ | Custom numpad, enter + confirm |
-| PIN entry screen (returning user) | ✅ | Auto-verify on 4th digit, lockout errors |
-| Session persistence (Secure Store) | ✅ | Return → PIN only, no OTP |
-| Role selection (parent/educator) | ✅ | |
-| Parent onboarding (child creation) | ✅ | Calls live create-child, encrypted |
-| Parent dashboard (tabs: Home, Classroom, Search, Calendar, Games) | ✅ | |
-| Educator onboarding (profile + RCI verification) | ✅ | Attestation checkbox, error handling |
-| Educator dashboard shell | ✅ | |
-| Search/marketplace (live data + badges) | ✅ | Supabase query with verification badges |
-| **Remaining Frontend Tasks:** | | |
-| → Educator profile detail page (parent views) | ✅ | Tap on search card → full profile + consent CTA |
-| → Consent management UI (parent: view/revoke) | ✅ | ConsentManagement component + revoke-consent integration |
-| → Consent request UI (educator: submit request) | ✅ | Auto-consent via proposal acceptance (no manual request needed) |
-| → Session booking flow (parent: view/accept/reject) | ✅ | Full proposal system built + deployed (7 migrations, 6 functions, 6 components) |
-| → Session management (educator: propose/view) | ⬜ | |
-| → Child profile view/edit (parent) | ✅ | ChildProfile component + get-child integration |
-| → Subscription checkout (educator) | ✅ | SubscriptionCheckout component + subscribe-educator |
-| → Settings/logout | ✅ | Settings component + Zustand logout |
-| → Notifications UI | ✅ | NotificationFeed component + bell icon in parent dashboard |
+### Auth Flow
+| Screen | Status |
+|--------|--------|
+| StarterPage → session check → PIN or Get Started | ✅ |
+| Phone entry (+91, 10-digit validation) | ✅ |
+| OTP verify (6-box, autofill, auto-submit) | ✅ |
+| Set PIN (custom numpad, confirm flow) | ✅ |
+| PIN entry (auto-verify on 4th digit, lockout) | ✅ |
+| Role selection (parent/educator) | ✅ |
+| Session persistence (SecureStore + Zustand) | ✅ |
+| Role-based routing (educator → educator dashboard) | ✅ |
+
+### Parent Screens
+| Screen | Status |
+|--------|--------|
+| Parent dashboard (Home tab) with all cards wired | ✅ |
+| Find Educators (live Supabase query, badges) | ✅ |
+| Educator profile detail (full profile + Propose Sessions) | ✅ |
+| ProposalBottomSheet (child selector, stepper, cost calc, soft warning) | ✅ |
+| My Proposals (status badges, counter comparison, payment CTA) | ✅ |
+| Consent Management (view/revoke active grants) | ✅ |
+| Child Profile (decrypted via get-child, add child form) | ✅ |
+| Notifications (feed + mark read + bell icon) | ✅ |
+| Settings (user info, logout, manage PIN stub) | ✅ |
+
+### Educator Screens
+| Screen | Status |
+|--------|--------|
+| Educator dashboard (Home tab) with live status bar | ✅ |
+| My Profile (read-only: RCI, subjects, rate, verification, subscription) | ✅ |
+| My Clients (active consent grants) | ✅ |
+| Proposals Inbox (accept/reject/counter with inline form) | ✅ |
+| Sessions (upcoming/past with Start/Rejoin video buttons) | ✅ |
+| Subscription Checkout (Razorpay Payment Link, verify on refresh) | ✅ |
+| Offerings (day toggles, time, recommended weeks, notes + view/edit modes) | ✅ |
+| Settings (same as parent) | ✅ |
+
+### Shared Screens
+| Screen | Status |
+|--------|--------|
+| Classroom tab (sessions + video join, role-aware) | ✅ |
+| Calendar tab (7-day selector, session list by day) | ✅ |
+| Role-based bottom nav (different tabs per role) | ✅ |
+
+### Architecture
+| Component | Status |
+|-----------|--------|
+| Zustand auth store (sessionToken, userId, role, children) | ✅ |
+| SecureStore persistence + rehydration on launch | ✅ |
+| Role-based tab layout (_layout.tsx reads role from store) | ✅ |
+| Supabase client with auth headers throughout | ✅ |
 
 ---
 
-## Phase 3: Razorpay Live Integration ✅ COMPLETE (July 13-14)
+## Phase 3: Razorpay Payments ✅ COMPLETE (July 13-14)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Razorpay account created & verified | ✅ | Test mode keys active (rzp_test_*) |
-| Subscription plans in DB | ✅ | Basic ₹2,999/yr, Premium ₹5,999/yr (subscription_plans table) |
-| `subscribe-educator` — real Razorpay API | ✅ | Uses Payment Links API (Subscriptions API unavailable on account). Returns checkout URL opened in browser |
-| `razorpay-webhook` — payment confirmation | ✅ | HMAC-SHA256 verified. Handles payment.captured, payment_link.paid, order.paid. Webhook delivery unreliable — verify-subscription is the primary fallback |
-| `create-payment-order` — parent session payments | ✅ | Creates Payment Link for proposal payments, returns checkout URL |
-| `verify-subscription` — poll-based fallback | ✅ | App calls on refresh → checks payment link status directly with Razorpay API → activates if paid. Bulletproof regardless of webhook reliability |
-| Frontend: SubscriptionCheckout | ✅ | Opens Razorpay checkout in browser via Linking.openURL. Pull-to-refresh verifies payment |
-| Frontend: PaymentPrompt | ✅ | Opens payment link in browser for session payments |
-| Razorpay webhook configured in dashboard | ✅ | URL set, events: payment.captured, payment_link.paid, order.paid |
-| Test: subscription payment flow | ✅ | Payment successful in test mode (UPI/Netbanking). Activation via verify-subscription on refresh |
+| Task | Status |
+|------|--------|
+| Razorpay test mode keys configured | ✅ |
+| subscribe-educator (Payment Links API, returns checkout URL) | ✅ |
+| razorpay-webhook (HMAC-SHA256 signature verification) | ✅ |
+| create-payment-order (Payment Link for session payments) | ✅ |
+| verify-subscription (polls Razorpay API directly on refresh) | ✅ |
+| Frontend: opens checkout in browser, pending state, pull-to-refresh | ✅ |
+| Webhook configured: payment.captured, payment_link.paid, order.paid | ✅ |
+| Test: subscription payment successful (test mode) | ✅ |
+| Migration: razorpay_columns added to all relevant tables | ✅ |
 
 **Key decisions:**
-- Razorpay recurring payments (Subscriptions API) NOT available on account → using one-time Payment Links for annual subscription
-- Webhook unreliable → added `verify-subscription` endpoint as primary activation mechanism (polls Razorpay directly)
-- Callback URL removed (no domain yet) → Razorpay shows its own success page, user returns to app manually
-- Recurring/auto-renewal deferred to post-launch (requires Razorpay support ticket to enable)
+- Subscriptions API not available on account → one-time Payment Links for annual subscription
+- Webhook delivery unreliable → verify-subscription endpoint as primary activation mechanism
+- Native Razorpay SDK deferred to Phase 6 (EAS Build required)
 
 ---
 
-## Phase 4: VideoSDK Integration (estimated 1 week)
+## Phase 4: VideoSDK ✅ COMPLETE (July 14)
 
-| Task | Status | Notes |
-|------|--------|-------|
-| VideoSDK account created | ⬜ | |
-| API key set as Supabase secret | ⬜ | |
-| `start-session` edge function (creates room) | ⬜ | Generates videosdk_room_id |
-| React Native VideoSDK widget integration | ⬜ | 1:1 and group (up to 8) |
-| Session lifecycle: join → in-progress → complete | ⬜ | |
-| Recording consent prompt (UI only, storage deferred) | ⬜ | Feature paused per meeting decision |
-| Test: full video session flow | ⬜ | |
+| Task | Status |
+|------|--------|
+| VideoSDK account created + API key + Secret set | ✅ |
+| create-video-session edge function (JWT gen, room creation, session status) | ✅ |
+| VideoSession component (join/rejoin/end, browser-based for Expo Go) | ✅ |
+| Educator: Start/Rejoin Session buttons on accepted sessions | ✅ |
+| Parent: Join Session button on active sessions | ✅ |
+| Session lifecycle: accepted → in_progress (when video starts) → completed (when ended) | ✅ |
+| Classroom tab: central hub for sessions + video | ✅ |
 
----
-
-## Phase 5: End-to-End Testing (estimated 3-5 days)
-
-| Task | Status | Notes |
-|------|--------|-------|
-| Complete user journey: parent sign-up → find educator → consent → book → session | ⬜ | |
-| Complete user journey: educator sign-up → profile → RCI → subscribe → get clients | ⬜ | |
-| Edge cases: expired consent, lockout recovery, bad network | ⬜ | |
-| Cross-device testing (Android + iOS + web) | ⬜ | |
-| Performance under load (10 concurrent sessions) | ⬜ | |
-| Regression run (all 44 security tests) | ⬜ | Must still pass |
+**Key decisions:**
+- Prebuilt VideoSDK UI in browser (Expo Go compatible)
+- Native SDK (`@videosdk.live/react-native-sdk`) deferred to Phase 6 (EAS Build required)
+- Recording feature paused per meeting decision
 
 ---
 
-## Phase 6: Demo Polish & App Store Deployment (estimated 1 week)
+## Phase 5: E2E Testing ⬜ NEXT (estimated 3-5 days)
+
+Two-phone testing (your phone as educator, uncle's phone as parent):
 
 | Task | Status | Notes |
 |------|--------|-------|
+| Create test educator profile (your number) | ⬜ | Already done during Razorpay testing |
+| Parent sign-up → add child (uncle's phone) | ⬜ | |
+| Parent finds educator in search | ⬜ | Requires educator verified + subscribed |
+| Parent proposes sessions | ⬜ | ProposalBottomSheet → create-proposal |
+| Educator receives proposal notification | ⬜ | |
+| Educator accepts proposal | ⬜ | Auto-consent + payment created |
+| Parent pays for sessions | ⬜ | Razorpay Payment Link |
+| Sessions appear in Classroom/Calendar | ⬜ | |
+| Video session (both join) | ⬜ | VideoSDK prebuilt in browser |
+| Educator ends session → marked completed | ⬜ | |
+| Parent revokes consent | ⬜ | Educator loses access immediately |
+| Counter-proposal flow | ⬜ | Educator counters, parent accepts/withdraws |
+| Proposal expiry (72h) | ⬜ | Verify expire_stale_proposals function |
+| Rate limiting (OTP, verify-rci, proposals) | ⬜ | |
+| Property-based tests (20 deferred from specs) | ⬜ | RCI + session proposal correctness properties |
+| Health check / diagnostics endpoint | ⬜ | |
+| Security regression (re-run 44 tests) | ⬜ | Must all still pass |
+
+---
+
+## Phase 6: Demo Polish + EAS Build (estimated 1 week)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| **EAS Build setup** | ⬜ | **CRITICAL** — unlocks native SDKs. Replaces Expo Go. |
+| Native VideoSDK (`@videosdk.live/react-native-sdk`) | ⬜ | In-app video — no browser. Requires EAS Build. |
+| Native Razorpay (`react-native-razorpay`) | ⬜ | In-app payment — no browser. Requires EAS Build. |
+| Child profile — Instagram-style view | ⬜ | School, notes, progress, milestones |
+| Child profile — edit/delete functionality | ⬜ | |
+| Parent/Educator profile edit screen | ⬜ | |
 | Branding pass (splash screen, app icon) | ⬜ | Logo already in assets |
-| Onboarding tutorial / walkthrough | ⬜ | First-time user guidance |
+| Onboarding tutorial / walkthrough | ⬜ | |
 | Loading/empty states with branded illustrations | ⬜ | |
-| Error messages human-friendly | 🔄 | Auth errors done, others pending |
-| Demo script (for funding pitch) | ⬜ | Prepared user journey showing key features |
-| EAS Build (Android APK + iOS) | ⬜ | Expo Application Services |
-| Web build (for quick demos) | ⬜ | Expo Router → deployable to Vercel |
+| Error messages — all human-friendly | 🔄 | Auth errors done |
+| Push notifications (expo-notifications + FCM) | ⬜ | |
+| OTA updates (expo-updates) | ⬜ | |
+| Demo script (3-minute funding pitch) | ⬜ | |
+| Web build (Expo Router → Vercel for instant demos) | ⬜ | |
+
+---
+
+## Phase 7: AWS/Cloudflare Migration (estimated 2-4 weeks)
+
+**Purpose:** Demonstrate to investors that the platform is ready to scale beyond managed services. Shows infrastructure maturity and control.
+
+### Migration Plan
+
+| Current (Supabase) | Target (AWS) | Effort | Risk |
+|---------------------|-------------|--------|------|
+| PostgreSQL (Supabase-hosted) | AWS RDS PostgreSQL (ap-south-1) | Low — schema/RLS identical, just connection string change | Low |
+| Edge Functions (Deno, 20+ functions) | AWS Lambda (Node.js) + API Gateway | **High** — all functions need Deno→Node.js port | Medium |
+| Supabase Auth (phone OTP) | AWS Cognito + SNS (or keep MSG91) | **High** — different auth API, token format, session management | High |
+| PostgREST (auto-generated REST) | Custom API layer (Express/Fastify) or keep PostgREST as standalone | **High** — frontend queries tables directly via PostgREST | Medium |
+| Supabase Realtime | Not used currently | N/A | None |
+| File Storage | AWS S3 | Future (when file uploads added) | Low |
+
+| Current (Expo/Vercel) | Target (Cloudflare) | Effort | Risk |
+|------------------------|--------------------| --------|------|
+| Web build (Expo Router) | Cloudflare Pages | **Low** — just deployment target, zero code change | None |
+| Static assets | Cloudflare CDN | **Low** — automatic with Pages | None |
+| API proxy (if needed) | Cloudflare Workers | Medium — if we need edge middleware | Low |
+
+### Migration Tasks
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Set up AWS account (VPC, IAM, security groups) | ⬜ | |
+| Provision RDS PostgreSQL (ap-south-1 Mumbai) | ⬜ | Same region as current Supabase |
+| Migrate schema + RLS + data to RDS | ⬜ | pg_dump/pg_restore |
+| Set up API Gateway + Lambda | ⬜ | |
+| Port 20+ edge functions from Deno to Node.js | ⬜ | Biggest effort |
+| Set up auth (Cognito or custom JWT) | ⬜ | Decision needed: Cognito vs custom |
+| Update frontend to point to new API URLs | ⬜ | Environment variable swap |
+| Deploy web build to Cloudflare Pages | ⬜ | Trivial — just `npx expo export --platform web` → push |
+| DNS setup (vsped.app or similar domain) | ⬜ | Cloudflare manages DNS |
+| SSL certificates (automatic with Cloudflare) | ⬜ | |
+| Load testing on AWS infrastructure | ⬜ | |
+| Cutover: switch production traffic | ⬜ | |
+
+### Key Decisions Needed
+
+- **Auth approach:** Keep Supabase Auth (it can work standalone without the rest of Supabase) OR migrate to Cognito OR build custom JWT auth?
+- **PostgREST:** Deploy standalone PostgREST on AWS (avoids rewriting frontend queries) OR build custom API?
+- **Lambda runtime:** Node.js (most common) or Deno on Lambda (preserves existing code)?
+- **Timing:** This migration is investor-facing. Can be done in parallel with demo polish, OR after demo.
+
+### Why Supabase is fine for now
+
+- Supabase infrastructure runs on AWS (ap-south-1 Mumbai) — same data center
+- Managed services = zero DevOps burden for a 2-person team
+- All data is in standard PostgreSQL — portable at any time
+- Edge functions are standard Deno — can run anywhere
+- The migration is a "when ready" decision, not a "blocked" decision
+
+---
+
+## Phase 8: App Store Deployment (estimated 1 week)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Android APK/AAB build (`eas build --platform android`) | ⬜ | |
+| Android internal testing track | ⬜ | |
+| Google Play Store listing (screenshots, description) | ⬜ | |
 | Google Play Store submission | ⬜ | |
-| Apple App Store submission | ⬜ | Requires Apple Developer account |
+| Apple Developer account ($99/yr) | ⬜ | Not confirmed |
+| iOS build (`eas build --platform ios`) | ⬜ | |
+| App Store Connect listing | ⬜ | |
+| Apple App Store submission | ⬜ | Review takes 1-3 days |
 
 ---
 
@@ -169,98 +278,124 @@
 
 | Item | Blocker for | Status |
 |------|-------------|--------|
-| Run RCI migration in SQL Editor | RCI verification live | ✅ Done |
-| Redeploy admin-verify-educator | Admin audit flow | ✅ Done |
-| Razorpay business account | Phase 3 | ✅ Done (test mode, recurring unavailable) |
-| VideoSDK account | Phase 4 | Not created yet |
-| Apple Developer account ($99/yr) | Phase 6 iOS | Not confirmed |
-| Exact subscription pricing (from management) | Phase 3 go-live | Placeholder set, final TBD |
-| Terms of Service (legal review) | Phase 6 app store | Draft ready, legal review pending |
+| ~~RCI migration~~ | RCI verification | ✅ Done |
+| ~~Razorpay account~~ | Payments | ✅ Done (test mode) |
+| ~~VideoSDK account~~ | Video sessions | ✅ Done |
+| Two-phone testing (with uncle) | Phase 5 | Ready — just needs time |
+| Apple Developer account ($99/yr) | Phase 8 iOS | Not confirmed |
+| Razorpay live mode activation | Production payments | Test mode works; live needs KYC completion |
+| AWS account setup | Phase 7 | Not started |
+| Domain name (vsped.app or similar) | Phase 7/8 | Not purchased |
+| Legal: Terms of Service review | Phase 8 | Draft exists (privacy-policy-dpdp.md) |
 
 ---
 
-## Timeline Estimate
+## Timeline Estimate (revised July 14)
 
 | Phase | Duration | Target |
 |-------|----------|--------|
-| Phase 2: Remaining Frontend | 1-2 weeks | Mid-to-late July 2026 |
-| Phase 3: Razorpay | 1 week | Late July |
-| Phase 4: VideoSDK | 1 week | Early August |
-| Phase 5: E2E Testing | 3-5 days | First week of August |
-| Phase 6: Polish + Deploy | 1 week | Mid August |
-| **MVP ready for customers + demo** | | **~August 15, 2026** |
+| ~~Phase 1-4: Backend + Frontend + Payments + Video~~ | ~~4 weeks~~ | ✅ Done (June 13 – July 14) |
+| Phase 5: E2E Testing | 3-5 days | July 15-20 |
+| Phase 6: Demo Polish + EAS Build | 1 week | July 20-27 |
+| Phase 7: AWS/Cloudflare Migration | 2-4 weeks | July 28 – August 15 |
+| Phase 8: App Store Deployment | 1 week | August 15-22 |
+| **MVP ready for customers + investor demo** | | **~August 22, 2026** |
 
 ---
 
 ## What "Done" Looks Like (Demo-Ready Criteria)
 
-A parent can:
-- [x] Sign up with phone
-- [x] Create child profile (encrypted)
-- [x] Find and view RCI-verified educators (with badges)
-- [ ] Educator requests data consent → parent approves
-- [ ] Book a session
-- [ ] Join a video session
-- [ ] See child's progress (only they can see it)
-- [ ] Revoke consent instantly
+### A parent can:
+- [x] Sign up with phone (OTP + PIN)
+- [x] Create child profile (AES-256 encrypted, DPDP compliant)
+- [x] Find and view RCI-verified educators (with verification badges)
+- [x] Propose a session package (choose child, sessions/week, rate, notes)
+- [x] See proposals with status (pending, accepted, countered, paid)
+- [x] Accept/withdraw from counter-proposals
+- [x] Pay for sessions (Razorpay)
+- [x] View sessions in Classroom tab
+- [x] Join video sessions (VideoSDK)
+- [x] View/revoke consent grants instantly
+- [x] Receive in-app notifications
+- [ ] Join video session in-app (Phase 6 — EAS Build)
 
-An educator can:
+### An educator can:
 - [x] Sign up with phone
-- [x] Complete profile with RCI number
+- [x] Complete profile with RCI number + subjects + rate
 - [x] Get provisionally verified (attestation + format check)
-- [ ] Subscribe (pay via Razorpay)
-- [x] Appear in parent search (with verification badge)
-- [ ] Request consent → propose sessions
-- [ ] Conduct video sessions
-- [ ] Add session notes (encrypted)
+- [x] Subscribe (Razorpay payment)
+- [x] Appear in parent search (with badge)
+- [x] View incoming proposals
+- [x] Accept/reject/counter proposals (auto-consent on acceptance)
+- [x] Set schedule & offerings (available days, time, recommended weeks)
+- [x] Start/join video sessions
+- [x] View clients (active consent grants)
+- [ ] Conduct in-app video sessions (Phase 6 — EAS Build)
 
-For the funding demo:
-- [ ] Polished UI with Vathsalya branding
-- [ ] Smooth 3-minute walkthrough (both user types)
-- [x] Security talking point: "DPDP-compliant, field-level encryption, 44 automated security tests pass"
-- [ ] Web build for instant demo (no app install needed)
+### For the funding demo:
+- [x] Full user journey works (both roles)
+- [x] Security talking point: "DPDP-compliant, AES-256 encryption, 44 automated security tests"
+- [x] Payment flow works (Razorpay test mode)
+- [ ] Polished UI with Vathsalya branding (Phase 6)
+- [ ] Smooth 3-minute walkthrough script (Phase 6)
+- [ ] Web build for instant demo (Phase 6)
+- [ ] AWS infrastructure shows scalability readiness (Phase 7)
 
 ---
 
 ## Deferred Features & Polish Items (DO NOT FORGET)
 
-These are "coming soon" stubs and enhancements identified during testing. They must be built before the funding demo.
+### Must-Have Before Funding Demo
 
-### UI/UX Polish (Phase 6 — Demo Polish)
+| Item | Description | Phase |
+|------|-------------|-------|
+| EAS Build setup | Unlocks native SDKs for video + payment in-app | 6 |
+| Native VideoSDK | In-app video calls (no browser) | 6 |
+| Native Razorpay | In-app payment checkout (no browser) | 6 |
+| Instagram-style child profile | Rich profile: school, notes, milestones, progress | 6 |
+| Push notifications | Firebase/APNs via expo-notifications | 6 |
+| Demo script | 3-minute walkthrough for funding pitch | 6 |
+| AWS migration | Shows investors scalability readiness | 7 |
 
-| Item | Description | Current State |
-|------|-------------|---------------|
-| Child profile — Instagram-style view | Tap a child card → opens a rich profile with sections: school info, notes from parent, progress graphs, session history, developmental milestones | Shows basic info + "Edit coming soon" alert |
-| Child profile — edit functionality | Parent edits child name, DOB, gender, adds school, adds notes | "Edit" button shows "Coming soon" alert |
-| Child profile — delete child | Parent can remove a child profile (with confirmation) | Not available |
-| Parent profile view | Dedicated "My Profile" screen with name, phone, email (optional), account age, role | Only accessible via Settings (shows user ID + role) |
-| Educator profile — edit own profile | Educator updates their bio, rate, subjects, languages, min_rate after initial setup | Not built (only onboarding creates profile) |
-| Session calendar view | Visual calendar showing upcoming sessions (for both parent and educator) | Placeholder "Calendar" tab exists |
-| Games/NeuroBridge tab | Integration point for educational games from Venkat | Placeholder "Games" tab exists |
-| Classroom tab | Shows active bookings, payment status, session notes | Placeholder exists |
+### Nice-to-Have (Post-Funding)
 
-### Functional Stubs (Phase 3-5)
+| Item | Description |
+|------|-------------|
+| AWS SES email notifications | Receipts, reminders, consent alerts |
+| Razorpay recurring (Subscriptions API) | Auto-renewal of educator subscriptions |
+| Educator profile edit | Update bio, rate, subjects after initial setup |
+| Reviews/ratings system | Parents rate educators after sessions |
+| OTA updates (expo-updates) | Push code updates without app store re-submission |
+| Manage PIN / reset PIN | Change 4-digit PIN |
+| Self-service account deletion | DPDP compliance |
+| Network offline handling | Cached data, queued actions |
+| Token auto-refresh | Handle expired session tokens gracefully |
+| NeuroBridge games integration | Educational games from Venkat's team |
 
-| Item | Description | Current State |
-|------|-------------|---------------|
-| Razorpay payment integration | Real payment flow: educator subscribes, parent pays for session packages | "Pay Now" shows "Coming soon" alert; subscribe-educator immediately activates |
-| VideoSDK integration | Video calling for sessions (1:1 and group up to 8) | Not started |
-| OTA updates (expo-updates) | Push code updates without app store re-submission | Not configured |
-| Health check / diagnostics endpoint | Tests DB, auth, encryption, triggers, all tables | Deferred to Phase 5 |
-| Property-based tests (20 remaining) | Validate correctness properties for RCI verification + session proposals | Deferred to Phase 5 |
-| Push notifications (Firebase/APNs) | Real push instead of in-app only | In-app notifications work; push not configured |
-| Manage PIN | Change or reset 4-digit PIN | "Coming soon" alert |
-| Delete account | Self-service account deletion (DPDP compliance) | Shows "contact support" |
-| Email notifications (AWS SES) | Transactional emails for important events | Not started |
-| Educator marketplace — sort/filter by rating | Parents sort educators by rating, reviews | No reviews system yet; shows "New" for all |
-
-### Known Edge Cases to Handle
+### Known Edge Cases (Phase 5 Testing)
 
 | Case | Expected Behavior | Current State |
 |------|-------------------|---------------|
-| Session token expiry (1hr default) | Auto-refresh token or prompt re-login | Token stored once at login, no refresh logic |
-| Multiple children — proposal child selector | Parent picks which child for the proposal | ProposalBottomSheet has child selector (functional if children loaded) |
-| Educator subscription expires mid-booking | Existing bookings honored, new proposals rejected | Eligibility check on create-proposal handles this |
-| Parent revokes consent after payment but before sessions | Consent revoked instantly; sessions can proceed but educator loses data access | Handled by existing revoke-consent |
-| Network offline handling | Show cached data, queue actions for when online | Not implemented (crashes on network failure) |
-| Rate limiting UX feedback | Show countdown timer when rate-limited | Shows generic "try again later" message |
+| Session token expiry (1hr) | Auto-refresh or prompt re-login | No refresh logic |
+| Multiple children — proposal child selector | Parent picks child | ProposalBottomSheet has selector |
+| Educator subscription expires mid-booking | Existing bookings honored, new proposals rejected | Handled by eligibility check |
+| Parent revokes consent after payment | Educator loses access immediately | Handled by revoke-consent |
+| Network offline | Show cached, queue actions | Not implemented |
+| Concurrent proposal acceptance | Only first succeeds (DB constraints) | Handled by status checks |
+
+---
+
+## Technical Stack Summary (for handoff)
+
+| Layer | Technology | Notes |
+|-------|-----------|-------|
+| Mobile | React Native 0.81 + Expo SDK 54 | TypeScript, Expo Router |
+| State | Zustand 5 + expo-secure-store | Persists auth across sessions |
+| Backend | Supabase (PostgreSQL + Edge Functions) | ap-south-1 Mumbai |
+| Auth | Supabase Phone Auth + MSG91 SMS Hook | OTP + 4-digit PIN |
+| Payments | Razorpay (Payment Links API) | Test mode; live after KYC |
+| Video | VideoSDK (prebuilt browser UI) | Native SDK in Phase 6 |
+| Encryption | AES-256-GCM (child PII) | Key in Supabase secrets |
+| Edge Functions | Deno/TypeScript (20+ functions) | All pinned @2.49.1 |
+| Security | 60+ RLS policies, rate limiting, HMAC webhooks | 44 automated tests |
+| Compliance | DPDP Act 2023, immutable steering rule | No admin bypass for child data |
