@@ -26,22 +26,21 @@ export default function OtpVerifyPage() {
   const inputs = useRef<(TextInput | null)[]>([]);
 
   const handleChange = (text: string, index: number) => {
-    // Handle paste/autofill: if text has multiple chars, spread across boxes
+    // Handle paste/autofill/SMS auto-read: if text has multiple chars, spread from box 0
     if (text.length > 1) {
       const digits = text.replace(/\D/g, '').slice(0, 6).split('');
-      const newOtp = [...otp];
+      const newOtp = ['', '', '', '', '', ''];
       digits.forEach((d, i) => {
-        if (index + i < 6) newOtp[index + i] = d;
+        if (i < 6) newOtp[i] = d;
       });
       setOtp(newOtp);
       setError('');
 
-      // Focus last filled box or submit
-      const lastIndex = Math.min(index + digits.length - 1, 5);
-      if (lastIndex === 5 && newOtp.join('').length === 6) {
+      // Auto-submit if we got all 6 digits
+      if (digits.length === 6) {
         verifyOtp(newOtp.join(''));
       } else {
-        inputs.current[Math.min(lastIndex + 1, 5)]?.focus();
+        inputs.current[Math.min(digits.length, 5)]?.focus();
       }
       return;
     }

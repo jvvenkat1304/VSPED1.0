@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
@@ -18,6 +19,7 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 export default function SetPinPage() {
   const { user_id, session_token, role } = useLocalSearchParams<{ user_id: string; session_token: string; role: string }>();
+  const insets = useSafeAreaInsets();
   const [pin, setPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [stage, setStage] = useState<'enter' | 'confirm'>('enter');
@@ -107,8 +109,7 @@ export default function SetPinPage() {
   const currentPin = stage === 'enter' ? pin : confirmPin;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom }]}>      <View style={styles.header}>
         <Text style={styles.title}>
           {stage === 'enter' ? 'Create a PIN' : 'Confirm your PIN'}
         </Text>
@@ -161,7 +162,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 24,
-    paddingTop: 80,
   },
   header: {
     alignItems: 'center',

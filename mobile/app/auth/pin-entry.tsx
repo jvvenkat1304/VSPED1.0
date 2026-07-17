@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
@@ -18,6 +19,7 @@ const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
 export default function PinEntryPage() {
   const { user_id, role } = useLocalSearchParams<{ user_id: string; role: string }>();
+  const insets = useSafeAreaInsets();
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -106,7 +108,7 @@ export default function PinEntryPage() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
         <Text style={styles.title}>Enter your PIN</Text>
         <Text style={styles.subtitle}>Enter your 4-digit PIN to continue</Text>
@@ -159,7 +161,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 24,
-    paddingTop: 80,
   },
   header: {
     alignItems: 'center',

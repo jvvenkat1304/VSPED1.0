@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
 
 const Colors = {
@@ -14,6 +15,7 @@ const Colors = {
 export default function StarterPage() {
   const [checking, setChecking] = useState(true);
   const isLoading = useAuthStore(state => state.isLoading);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // Wait for auth store to finish hydrating before checking session
@@ -47,7 +49,7 @@ export default function StarterPage() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40 }]}>
       {/* Logo */}
       <View style={styles.logoContainer}>
         <Image
@@ -83,7 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 80,
     paddingHorizontal: 24,
   },
   logoContainer: {

@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { AppState } from 'react-native';
 import { Slot } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../store/authStore';
 
 export default function RootLayout() {
@@ -28,5 +30,10 @@ export default function RootLayout() {
     };
   }, []);
 
-  return <Slot />;
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <Slot />
+    </SafeAreaProvider>
+  );
 }
