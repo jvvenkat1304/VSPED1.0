@@ -82,6 +82,7 @@ export default function PaymentPrompt({
         Alert.alert('Error', data.message || 'Failed to create payment. Please try again.');
       }
     } catch (error) {
+      console.error('[PaymentPrompt] error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
     } finally {
       setLoading(false);

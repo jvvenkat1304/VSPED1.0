@@ -18,7 +18,8 @@ Deno.serve(async (req) => {
     try {
       const wh = new Webhook(base64Secret);
       data = wh.verify(payload, headers) as typeof data;
-    } catch (_e) {
+    } catch (err) {
+      console.error('[send-sms-hook] signature verification error:', err);
       return new Response(
         JSON.stringify({ error: "Invalid signature" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
@@ -60,7 +61,8 @@ Deno.serve(async (req) => {
       JSON.stringify({}),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
-  } catch (_err) {
+  } catch (err) {
+    console.error('[send-sms-hook] error:', err);
     return new Response(
       JSON.stringify({ error: "Server error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }

@@ -28,7 +28,7 @@ const SUBJECTS = [
 const LANGUAGES = ['English', 'Hindi', 'Telugu', 'Tamil', 'Kannada', 'Malayalam', 'Marathi', 'Bengali'];
 
 export default function EducatorSetupPage() {
-  const { user_id, session_token } = useLocalSearchParams<{ user_id: string; session_token: string }>();
+  const { session_token } = useLocalSearchParams<{ session_token: string }>();
 
   const [fullName, setFullName] = useState('');
   const [rciNumber, setRciNumber] = useState('');
@@ -57,21 +57,24 @@ export default function EducatorSetupPage() {
     );
   };
 
-  const handleCreateProfile = async () => {
-    if (!fullName.trim()) { setError('Name is required'); return; }
-    if (!rciNumber.trim()) { setError('RCI number is required'); return; }
-    if (selectedSubjects.length === 0) { setError('Select at least one subject'); return; }
-    if (selectedLanguages.length === 0) { setError('Select at least one language'); return; }
-
-    // Validate min rate if both rates are filled
+  const validateProfileInput = (): string | null => {
+    if (!fullName.trim()) return 'Name is required';
+    if (!rciNumber.trim()) return 'RCI number is required';
+    if (selectedSubjects.length === 0) return 'Select at least one subject';
+    if (selectedLanguages.length === 0) return 'Select at least one language';
     if (sessionRate && minRate) {
-      const parsedMinRate = parseInt(minRate);
-      const parsedSessionRate = parseInt(sessionRate);
+      const parsedMinRate = Number.parseInt(minRate);
+      const parsedSessionRate = Number.parseInt(sessionRate);
       if (parsedMinRate <= 0 || parsedMinRate < parsedSessionRate - 100) {
-        setError('Minimum rate must be within ₹100 of your listed rate');
-        return;
+        return 'Minimum rate must be within ₹100 of your listed rate';
       }
     }
+    return null;
+  };
+
+  const handleCreateProfile = async () => {
+    const validationError = validateProfileInput();
+    if (validationError) { setError(validationError); return; }
 
     setError('');
     setLoading(true);
@@ -91,8 +94,8 @@ export default function EducatorSetupPage() {
           languages: selectedLanguages,
           bio: bio.trim() || null,
           city: city.trim() || null,
-          session_rate_inr: sessionRate ? parseInt(sessionRate) : null,
-          min_rate_inr: minRate ? parseInt(minRate) : null,
+          session_rate_inr: sessionRate ? Number.parseInt(sessionRate) : null,
+          min_rate_inr: minRate ? Number.parseInt(minRate) : null,
         }),
       });
 
@@ -104,6 +107,7 @@ export default function EducatorSetupPage() {
         setError(data.message || 'Failed to create profile');
       }
     } catch (err) {
+      console.error('[EducatorSetup] create profile error:', err);
       setError('Network error');
     } finally {
       setLoading(false);
@@ -143,6 +147,7 @@ export default function EducatorSetupPage() {
         setError(data.message || 'RCI verification failed');
       }
     } catch (err) {
+      console.error('[EducatorSetup] verify RCI error:', err);
       setError('Network error');
     } finally {
       setVerifying(false);

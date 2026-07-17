@@ -1,7 +1,7 @@
 # V-SPED Progress Tracker
 
 **Goal:** A working, functioning app ready for initial customers, funding demo, and scalable infrastructure.
-**Last Updated:** July 16, 2026
+**Last Updated:** July 17, 2026
 
 ---
 
@@ -14,7 +14,7 @@
 | Phase 2: Mobile Frontend | 100% | ✅ DONE |
 | Phase 3: Razorpay Payments | 100% | ✅ DONE |
 | Phase 4: VideoSDK | 100% | ✅ DONE |
-| Phase 5: E2E Testing | 40% | 🔄 7 critical bugs FIXED (code complete), pending deploy + test |
+| Phase 5: E2E Testing | 55% | 🔄 7 critical bugs FIXED (commit 4dab557) + 6 runtime bugs FIXED (auth/routing) + 95/104 SonarQube issues fixed, pending two-phone test |
 | Phase 6: Demo Polish + EAS Build | 10% | 🔄 Brand colors done |
 | Phase 7: AWS/Cloudflare Migration | 0% | ⬜ Post-testing |
 | Phase 8: App Store Deployment | 0% | ⬜ Final step |
@@ -179,7 +179,7 @@ Two-phone testing (your phone as educator, uncle's phone as parent):
 | Rate limiting (OTP, verify-rci, proposals) | ⬜ | |
 | Property-based tests (20 deferred from specs) | ⬜ | RCI + session proposal correctness properties |
 | Health check / diagnostics endpoint | ⬜ | |
-| Security regression (re-run 44 tests) | ⬜ | Must all still pass |
+| Security regression (re-run 44 tests) | 🔄 | SonarQube full scan: 0 issues on all 27 backend files |
 
 ---
 
@@ -376,11 +376,11 @@ Two-phone testing (your phone as educator, uncle's phone as parent):
 
 | Case | Expected Behavior | Current State |
 |------|-------------------|---------------|
-| Session token expiry (1hr) | Auto-refresh or prompt re-login | No refresh logic |
+| Session token expiry (1hr) | Auto-refresh or prompt re-login | ✅ Proactive refresh + resilient retry |
 | Multiple children — proposal child selector | Parent picks child | ProposalBottomSheet has selector |
 | Educator subscription expires mid-booking | Existing bookings honored, new proposals rejected | Handled by eligibility check |
 | Parent revokes consent after payment | Educator loses access immediately | Handled by revoke-consent |
-| Network offline | Show cached, queue actions | Not implemented |
+| Network offline | Show cached, queue actions | Partial: refresh won't logout on hiccup |
 | Concurrent proposal acceptance | Only first succeeds (DB constraints) | Handled by status checks |
 
 ---

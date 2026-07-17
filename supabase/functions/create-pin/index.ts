@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (err) {
+    console.error('[create-pin] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }

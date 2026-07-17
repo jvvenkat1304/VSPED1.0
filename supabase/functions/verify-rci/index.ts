@@ -178,7 +178,8 @@ Deno.serve(async (req) => {
       message:
         "RCI number verified. Your profile is now visible while we complete manual review.",
     });
-  } catch (_err) {
+  } catch (err) {
+    console.error('[verify-rci] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { router } from 'expo-router';
 import {
   View,
   Text,
@@ -53,6 +52,10 @@ function calculateAge(dob: string | null): number | null {
     age--;
   }
   return age;
+}
+
+function handleEdit() {
+  Alert.alert('Coming Soon', 'Edit functionality will be available in the next update.');
 }
 
 export default function ChildProfile({ sessionToken }: ChildProfileProps) {
@@ -135,9 +138,7 @@ export default function ChildProfile({ sessionToken }: ChildProfileProps) {
     fetchDetails();
   }, [fetchChildren, fetchDetails]);
 
-  function handleEdit() {
-    Alert.alert('Coming Soon', 'Edit functionality will be available in the next update.');
-  }
+  // --- Render ---
 
   const [showAddForm, setShowAddForm] = useState(false);
 

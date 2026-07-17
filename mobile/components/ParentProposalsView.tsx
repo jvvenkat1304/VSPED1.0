@@ -121,6 +121,7 @@ export default function ParentProposalsView({ sessionToken }: ParentProposalsVie
         setProposals(sorted);
       }
     } catch (error) {
+      console.error('[ParentProposalsView] fetch error:', error);
       Alert.alert('Error', 'Failed to load proposals. Please try again.');
     } finally {
       setLoading(false);
@@ -177,6 +178,7 @@ export default function ParentProposalsView({ sessionToken }: ParentProposalsVie
         Alert.alert('Error', data.error || 'Action failed. Please try again.');
       }
     } catch (error) {
+      console.error('[ParentProposalsView] respond counter error:', error);
       Alert.alert('Error', 'Network error. Please try again.');
     } finally {
       setActionLoading(null);
@@ -213,6 +215,7 @@ export default function ParentProposalsView({ sessionToken }: ParentProposalsVie
         Alert.alert('Error', data.message || 'Failed to initiate payment. Please try again.');
       }
     } catch (error) {
+      console.error('[ParentProposalsView] payment error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
     }
   }

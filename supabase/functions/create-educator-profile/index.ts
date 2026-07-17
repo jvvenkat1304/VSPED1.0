@@ -37,9 +37,7 @@ Deno.serve(async (req) => {
     }
 
     // Determine effective min_rate_inr: default to session_rate_inr if not provided
-    const effective_min_rate_inr = min_rate_inr !== undefined && min_rate_inr !== null
-      ? min_rate_inr
-      : session_rate_inr || null;
+    const effective_min_rate_inr = min_rate_inr ?? session_rate_inr ?? null;
 
     // Validate min_rate_inr if explicitly provided
     if (min_rate_inr !== undefined && min_rate_inr !== null) {
@@ -103,7 +101,8 @@ Deno.serve(async (req) => {
       message: "Educator profile created. Please verify your RCI number to get listed.",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[create-educator-profile] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

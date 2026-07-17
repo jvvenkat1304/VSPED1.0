@@ -102,7 +102,7 @@ export default function EducatorSessions({ sessionToken }: EducatorSessionsProps
         id: s.id,
         start_time: s.start_time,
         status: s.status || 'proposed',
-        child_name: consentMap[s.child_id] ? null : null,
+        child_name: null, // Child name fetched separately via get-child when consent is active
         consent_active: consentMap[s.child_id] || false,
       }));
 

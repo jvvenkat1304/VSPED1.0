@@ -13,7 +13,7 @@ const supabaseAdmin = createClient(
 const ENCRYPTION_KEY = Deno.env.get("CHILD_DATA_ENCRYPTION_KEY")!;
 
 async function encrypt(plaintext: string): Promise<string> {
-  const keyBytes = new Uint8Array(ENCRYPTION_KEY.match(/.{2}/g)!.map(b => parseInt(b, 16)));
+  const keyBytes = new Uint8Array(ENCRYPTION_KEY.match(/.{2}/g)!.map(b => Number.parseInt(b, 16)));
   const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["encrypt"]);
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encoded = new TextEncoder().encode(plaintext);
@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
       message: "Child profile created successfully",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[create-child] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

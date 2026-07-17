@@ -55,7 +55,7 @@ function EducatorProfileView({ sessionToken }: { sessionToken: string }) {
         <View><Text style={{ fontSize: 12, color: Colors.textLight }}>City</Text><Text style={{ fontSize: 14, color: Colors.text }}>{(profile.city as string) || 'Not set'}</Text></View>
         <View><Text style={{ fontSize: 12, color: Colors.textLight }}>Session Rate</Text><Text style={{ fontSize: 16, fontWeight: '700', color: Colors.accent }}>₹{profile.session_rate_inr || 0}/session</Text></View>
         <View><Text style={{ fontSize: 12, color: Colors.textLight }}>Min Rate (private)</Text><Text style={{ fontSize: 14, color: Colors.text }}>₹{profile.min_rate_inr || profile.session_rate_inr || 0}</Text></View>
-        <View><Text style={{ fontSize: 12, color: Colors.textLight }}>Verification</Text><Text style={{ fontSize: 14, color: Colors.success }}>{profile.verification_status === 'verified' ? '✅ Verified' : profile.verification_status === 'provisionally_verified' ? '⏳ Provisional' : '⏳ Pending'}</Text></View>
+        <View><Text style={{ fontSize: 12, color: Colors.textLight }}>Verification</Text><Text style={{ fontSize: 14, color: Colors.success }}>{getVerificationLabel(profile.verification_status)}</Text></View>
         <View><Text style={{ fontSize: 12, color: Colors.textLight }}>Subscription</Text><Text style={{ fontSize: 14, color: profile.subscription_status === 'active' ? Colors.success : Colors.accent }}>{profile.subscription_status === 'active' ? '✅ Active' : '⏳ ' + (profile.subscription_status || 'none')}</Text></View>
       </View>
       <Text style={{ fontSize: 12, color: Colors.textLight, marginTop: 16, textAlign: 'center', fontStyle: 'italic' }}>Profile editing coming in next update</Text>
@@ -96,9 +96,9 @@ function EducatorClientsView({ sessionToken }: { sessionToken: string }) {
           <Text style={{ fontSize: 14, color: Colors.textLight, textAlign: 'center' }}>When a parent accepts your proposal, their child will appear here with consent-granted access.</Text>
         </View>
       ) : (
-        clients.map((c, i) => (
-          <View key={i} style={{ backgroundColor: Colors.card, borderRadius: 14, padding: 18, marginBottom: 12 }}>
-            <Text style={{ fontSize: 15, fontWeight: '600', color: Colors.text }}>Client #{i + 1}</Text>
+        clients.map((c, idx) => (
+          <View key={c.id || c.child_id || c.granted_at} style={{ backgroundColor: Colors.card, borderRadius: 14, padding: 18, marginBottom: 12 }}>
+            <Text style={{ fontSize: 15, fontWeight: '600', color: Colors.text }}>Client #{idx + 1}</Text>
             <Text style={{ fontSize: 12, color: Colors.textLight, marginTop: 4 }}>Access granted: {new Date(c.granted_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
             <Text style={{ fontSize: 12, color: Colors.success, marginTop: 4 }}>✅ Active consent</Text>
           </View>
@@ -106,6 +106,18 @@ function EducatorClientsView({ sessionToken }: { sessionToken: string }) {
       )}
     </ScrollView>
   );
+}
+
+function getVerificationLabel(status: string | null): string {
+  if (status === 'verified') return '✅ Verified';
+  if (status === 'provisionally_verified') return '⏳ Provisional';
+  return '⏳ Pending';
+}
+
+function getSubscriptionLabel(status: string | null): string {
+  if (status === 'active') return '✅ Active';
+  if (status === 'pending') return '⏳ Payment Pending';
+  return '⏳ Not active';
 }
 
 export default function EducatorDashboard() {
@@ -227,12 +239,12 @@ export default function EducatorDashboard() {
         <Text style={styles.statusLabel}>Profile Status</Text>
         <View style={styles.statusRow}>
           <Text style={styles.statusItem}>
-            RCI Verified: {verificationStatus === 'verified' ? '✅ Verified' : verificationStatus === 'provisionally_verified' ? '⏳ Provisional' : '⏳ Pending'}
+            RCI Verified: {getVerificationLabel(verificationStatus)}
           </Text>
         </View>
         <View style={styles.statusRow}>
           <Text style={styles.statusItem}>
-            Subscription: {subscriptionStatus === 'active' ? '✅ Active' : subscriptionStatus === 'pending' ? '⏳ Payment Pending' : '⏳ Not active'}
+            Subscription: {getSubscriptionLabel(subscriptionStatus)}
           </Text>
         </View>
         {(verificationStatus !== 'verified' && verificationStatus !== 'provisionally_verified') || subscriptionStatus !== 'active' ? (

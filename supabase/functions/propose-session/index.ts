@@ -95,7 +95,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    // TODO: Send notification to parent about the proposed session
+    // Notify parent about the proposed session
+    await supabaseAdmin.from("notifications").insert({
+      user_id: grant.parent_id,
+      type: "session_proposed",
+      title: "New Session Proposed",
+      body: `An educator has proposed a session on ${new Date(start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`,
+      metadata: { session_id: session.id },
+    });
 
     return Response.json({
       success: true,
@@ -106,7 +113,8 @@ Deno.serve(async (req) => {
       message: "Session proposed. Awaiting parent acceptance.",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[propose-session] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

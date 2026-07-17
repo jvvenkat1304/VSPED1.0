@@ -62,8 +62,8 @@ export default function ProposalBottomSheet({
   const [submitting, setSubmitting] = useState(false);
 
   // Parsed numeric values
-  const totalSessionsNum = parseInt(totalSessions, 10) || 0;
-  const proposedRateNum = parseInt(proposedRate, 10) || 0;
+  const totalSessionsNum = Number.parseInt(totalSessions, 10) || 0;
+  const proposedRateNum = Number.parseInt(proposedRate, 10) || 0;
 
   // Cost breakdown (re-computed when total_sessions or rate changes)
   const costBreakdown = useMemo(() => {
@@ -138,6 +138,7 @@ export default function ProposalBottomSheet({
         Alert.alert('Error', message);
       }
     } catch (err) {
+      console.error('[ProposalBottomSheet] error:', err);
       Alert.alert('Network Error', 'Could not connect to the server. Please check your connection.');
     } finally {
       setSubmitting(false);
@@ -232,7 +233,7 @@ export default function ProposalBottomSheet({
                 placeholder="e.g. 12"
                 placeholderTextColor={Colors.placeholder}
                 value={totalSessions}
-                onChangeText={(text) => setTotalSessions(text.replace(/[^0-9]/g, ''))}
+                onChangeText={(text) => setTotalSessions(text.replace(/\D/g, ''))}
               />
             </View>
 
@@ -245,7 +246,7 @@ export default function ProposalBottomSheet({
                 placeholder={`Listed: ₹${listedRate}`}
                 placeholderTextColor={Colors.placeholder}
                 value={proposedRate}
-                onChangeText={(text) => setProposedRate(text.replace(/[^0-9]/g, ''))}
+                onChangeText={(text) => setProposedRate(text.replace(/\D/g, ''))}
               />
             </View>
 

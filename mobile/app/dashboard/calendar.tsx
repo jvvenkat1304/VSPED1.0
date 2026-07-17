@@ -166,7 +166,7 @@ export default function CalendarScreen() {
 
             return (
               <Pressable
-                key={index}
+                key={day.toISOString()}
                 style={styles.dayColumn}
                 onPress={() => setSelectedDate(day)}
               >

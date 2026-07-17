@@ -52,6 +52,7 @@ export default function PhoneEntryPage() {
         setError(data.message || 'Failed to send OTP. Try again.');
       }
     } catch (err) {
+      console.error('[PhoneEntry] error:', err);
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);

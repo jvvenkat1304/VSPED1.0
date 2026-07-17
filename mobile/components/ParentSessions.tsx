@@ -47,6 +47,23 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   cancelled: { label: 'Cancelled', color: Colors.warning, bg: '#fef2f2' },
 };
 
+function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  return (
+    date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }) +
+    ' at ' +
+    date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    })
+  );
+}
+
 export default function ParentSessions({ sessionToken }: ParentSessionsProps) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,23 +118,6 @@ export default function ParentSessions({ sessionToken }: ParentSessionsProps) {
   const pastSessions = sessions.filter(
     (s) => s.status === 'completed' || s.status === 'cancelled'
   );
-
-  function formatDateTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    return (
-      date.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }) +
-      ' at ' +
-      date.toLocaleTimeString('en-IN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      })
-    );
-  }
 
   function renderStatusBadge(status: string) {
     const config = STATUS_CONFIG[status] || STATUS_CONFIG.proposed;

@@ -77,8 +77,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
 
       if (error || !data.session) {
-        // Unrecoverable — force logout
-        await get().logout();
+        // Only logout if the token is truly invalid/expired (not a network hiccup)
+        const isTokenInvalid = error?.message?.toLowerCase().includes('invalid') ||
+          error?.message?.toLowerCase().includes('expired') ||
+          error?.message?.toLowerCase().includes('not found') ||
+          error?.status === 401 || error?.status === 403;
+
+        if (isTokenInvalid) {
+          await get().logout();
+        }
+        set({ isRefreshing: false });
         return false;
       }
 

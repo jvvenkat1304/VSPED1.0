@@ -43,6 +43,24 @@ interface Plan {
   is_popular?: boolean;
 }
 
+function getStatusBg(status: string | null): string {
+  if (status === 'active') return '#eef7f4';
+  if (status === 'pending') return '#fef3e6';
+  return '#fef9f0';
+}
+
+function getStatusColor(status: string | null): string {
+  if (status === 'active') return '#9caf88';
+  if (status === 'pending') return '#e67e22';
+  return '#d4a35d';
+}
+
+function getStatusText(status: string | null): string {
+  if (status === 'active') return '✓ Active';
+  if (status === 'pending') return '⏳ Payment Pending';
+  return '⏳ Inactive';
+}
+
 export default function SubscriptionCheckout({ sessionToken }: SubscriptionCheckoutProps) {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -190,6 +208,7 @@ export default function SubscriptionCheckout({ sessionToken }: SubscriptionCheck
         Alert.alert('Error', data.message || 'Failed to start subscription. Please try again.');
       }
     } catch (error) {
+      console.error('[SubscriptionCheckout] error:', error);
       Alert.alert('Error', 'Network error. Please try again.');
     } finally {
       setSubscribing(null);
@@ -226,21 +245,16 @@ export default function SubscriptionCheckout({ sessionToken }: SubscriptionCheck
         <View style={[
           styles.statusBadge,
           {
-            backgroundColor:
-              currentStatus === 'active' ? '#eef7f4' :
-              currentStatus === 'pending' ? '#fef3e6' : '#fef9f0',
+            backgroundColor: getStatusBg(currentStatus),
           }
         ]}>
           <Text style={[
             styles.statusText,
             {
-              color:
-                currentStatus === 'active' ? Colors.success :
-                currentStatus === 'pending' ? '#e67e22' : Colors.accent,
+              color: getStatusColor(currentStatus),
             }
           ]}>
-            {currentStatus === 'active' ? '✓ Active' :
-             currentStatus === 'pending' ? '⏳ Payment Pending' : '⏳ Inactive'}
+            {getStatusText(currentStatus)}
           </Text>
         </View>
       </View>
@@ -281,8 +295,8 @@ export default function SubscriptionCheckout({ sessionToken }: SubscriptionCheck
 
             {/* Features */}
             <View style={styles.featuresSection}>
-              {plan.features.map((feature, index) => (
-                <View key={index} style={styles.featureRow}>
+              {plan.features.map((feature) => (
+                <View key={feature} style={styles.featureRow}>
                   <Text style={styles.featureCheck}>✓</Text>
                   <Text style={styles.featureText}>{feature}</Text>
                 </View>

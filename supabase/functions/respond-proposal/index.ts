@@ -402,10 +402,7 @@ async function handleCounter(
   }
 
   // Validate counter_rate_inr >= educator's min_rate_inr
-  const effectiveMinRate =
-    educator.min_rate_inr !== null && educator.min_rate_inr !== undefined
-      ? educator.min_rate_inr
-      : educator.session_rate_inr;
+  const effectiveMinRate = educator.min_rate_inr ?? educator.session_rate_inr;
 
   if (counter_rate_inr! < effectiveMinRate) {
     return Response.json(

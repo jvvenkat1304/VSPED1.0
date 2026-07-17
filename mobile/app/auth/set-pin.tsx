@@ -33,19 +33,17 @@ export default function SetPinPage() {
           setTimeout(() => setStage('confirm'), 200);
         }
       }
-    } else {
-      if (confirmPin.length < 4) {
-        const newConfirm = confirmPin + digit;
-        setConfirmPin(newConfirm);
-        if (newConfirm.length === 4) {
-          if (newConfirm === pin) {
-            createPin(newConfirm);
-          } else {
-            setError("PINs don't match. Try again.");
-            setPin('');
-            setConfirmPin('');
-            setStage('enter');
-          }
+    } else if (confirmPin.length < 4) {
+      const newConfirm = confirmPin + digit;
+      setConfirmPin(newConfirm);
+      if (newConfirm.length === 4) {
+        if (newConfirm === pin) {
+          createPin(newConfirm);
+        } else {
+          setError("PINs don't match. Try again.");
+          setPin('');
+          setConfirmPin('');
+          setStage('enter');
         }
       }
     }
@@ -75,8 +73,15 @@ export default function SetPinPage() {
 
       const data = await response.json();
       if (data.success) {
-        // Store session in global auth store (also persists to SecureStore)
-        await useAuthStore.getState().setAuth(user_id || '', session_token || '', role || 'parent');
+        // Auth was already stored by otp-verify. Just ensure role is set correctly.
+        // Read existing refreshToken from store (set by otp-verify before navigating here)
+        const existingRefreshToken = useAuthStore.getState().refreshToken || '';
+        await useAuthStore.getState().setAuth(
+          user_id || '',
+          session_token || useAuthStore.getState().sessionToken || '',
+          existingRefreshToken,
+          role || 'parent'
+        );
         // Mark that PIN has been created for quick login on next app launch
         await SecureStore.setItemAsync('has_pin', 'true');
 
@@ -92,6 +97,7 @@ export default function SetPinPage() {
         setStage('enter');
       }
     } catch (err) {
+      console.error('[SetPin] error:', err);
       setError('Network error');
     } finally {
       setLoading(false);

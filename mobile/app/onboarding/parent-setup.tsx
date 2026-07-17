@@ -20,7 +20,7 @@ const BASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co/functions/v1';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
 
 export default function ParentSetupPage() {
-  const { user_id, session_token: paramToken } = useLocalSearchParams<{ user_id: string; session_token: string }>();
+  const { session_token: paramToken } = useLocalSearchParams<{ session_token: string }>();
   const storeToken = useAuthStore(state => state.sessionToken);
   const session_token = storeToken || paramToken || '';
   
@@ -48,9 +48,9 @@ export default function ParentSetupPage() {
     }
 
     // Build and validate the date
-    const day = parseInt(dobDay, 10);
-    const month = parseInt(dobMonth, 10);
-    const year = parseInt(dobYear, 10);
+    const day = Number.parseInt(dobDay, 10);
+    const month = Number.parseInt(dobMonth, 10);
+    const year = Number.parseInt(dobYear, 10);
     
     if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2000 || year > new Date().getFullYear()) {
       setError('Please enter a valid date of birth');
@@ -59,7 +59,7 @@ export default function ParentSetupPage() {
 
     const dobFormatted = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dobDate = new Date(dobFormatted);
-    if (isNaN(dobDate.getTime()) || dobDate > new Date()) {
+    if (Number.isNaN(dobDate.getTime()) || dobDate > new Date()) {
       setError('Please enter a valid date of birth');
       return;
     }
@@ -92,6 +92,7 @@ export default function ParentSetupPage() {
         setError((data.message || 'Failed to create profile.') + detail);
       }
     } catch (err) {
+      console.error('[ParentSetup] error:', err);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -151,7 +152,7 @@ export default function ParentSetupPage() {
               placeholder="DD"
               placeholderTextColor={Colors.placeholder}
               value={dobDay}
-              onChangeText={(t) => setDobDay(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              onChangeText={(t) => setDobDay(t.replace(/\D/g, '').slice(0, 2))}
               keyboardType="number-pad"
               maxLength={2}
             />
@@ -160,7 +161,7 @@ export default function ParentSetupPage() {
               placeholder="MM"
               placeholderTextColor={Colors.placeholder}
               value={dobMonth}
-              onChangeText={(t) => setDobMonth(t.replace(/[^0-9]/g, '').slice(0, 2))}
+              onChangeText={(t) => setDobMonth(t.replace(/\D/g, '').slice(0, 2))}
               keyboardType="number-pad"
               maxLength={2}
             />
@@ -169,7 +170,7 @@ export default function ParentSetupPage() {
               placeholder="YYYY"
               placeholderTextColor={Colors.placeholder}
               value={dobYear}
-              onChangeText={(t) => setDobYear(t.replace(/[^0-9]/g, '').slice(0, 4))}
+              onChangeText={(t) => setDobYear(t.replace(/\D/g, '').slice(0, 4))}
               keyboardType="number-pad"
               maxLength={4}
             />

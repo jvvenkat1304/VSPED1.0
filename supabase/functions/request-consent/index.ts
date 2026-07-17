@@ -99,7 +99,14 @@ Deno.serve(async (req) => {
       details: { reason, duration_hours, scope: scope || ["progress", "session_notes"] },
     });
 
-    // TODO: Send push notification to parent (notification system not yet built)
+    // Notify parent about the consent request
+    await supabaseAdmin.from("notifications").insert({
+      user_id: child.parent_id,
+      type: "consent_requested",
+      title: "Data Access Request",
+      body: `An educator is requesting access to your child's data. Reason: ${reason}`,
+      metadata: { consent_request_id: request.id, requester_id: user.id },
+    });
 
     return Response.json({
       success: true,
@@ -107,7 +114,8 @@ Deno.serve(async (req) => {
       message: "Consent request submitted. Awaiting parent approval.",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[request-consent] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

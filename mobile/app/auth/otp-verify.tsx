@@ -116,6 +116,7 @@ export default function OtpVerifyPage() {
         inputs.current[0]?.focus();
       }
     } catch (err) {
+      console.error('[OtpVerify] error:', err);
       setError('Network error. Please check your connection.');
     } finally {
       setLoading(false);
@@ -141,7 +142,7 @@ export default function OtpVerifyPage() {
         <View style={styles.otpContainer}>
           {otp.map((digit, index) => (
             <TextInput
-              key={index}
+              key={`otp-box-${index}`}
               ref={(ref) => { inputs.current[index] = ref; }}
               style={[styles.otpBox, digit ? styles.otpBoxFilled : null]}
               value={digit}

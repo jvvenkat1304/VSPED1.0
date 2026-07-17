@@ -14,9 +14,9 @@ const ENCRYPTION_KEY = Deno.env.get("CHILD_DATA_ENCRYPTION_KEY")!;
 
 async function decrypt(encryptedStr: string): Promise<string> {
   const [ivHex, ctHex] = encryptedStr.split(":");
-  const iv = new Uint8Array(ivHex.match(/.{2}/g)!.map(b => parseInt(b, 16)));
-  const ciphertext = new Uint8Array(ctHex.match(/.{2}/g)!.map(b => parseInt(b, 16)));
-  const keyBytes = new Uint8Array(ENCRYPTION_KEY.match(/.{2}/g)!.map(b => parseInt(b, 16)));
+  const iv = new Uint8Array(ivHex.match(/.{2}/g)!.map(b => Number.parseInt(b, 16)));
+  const ciphertext = new Uint8Array(ctHex.match(/.{2}/g)!.map(b => Number.parseInt(b, 16)));
+  const keyBytes = new Uint8Array(ENCRYPTION_KEY.match(/.{2}/g)!.map(b => Number.parseInt(b, 16)));
   const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, ["decrypt"]);
   const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
   return new TextDecoder().decode(decrypted);
@@ -108,7 +108,8 @@ Deno.serve(async (req) => {
       },
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[get-child] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

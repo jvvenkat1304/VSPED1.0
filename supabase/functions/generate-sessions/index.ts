@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
     // Auth: only accept calls with service role key
     const authHeader = req.headers.get("Authorization");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    if (!authHeader || !authHeader.includes(serviceRoleKey)) {
+    if (!authHeader?.includes(serviceRoleKey)) {
       return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
       .single();
 
     const scheduleConfig = educator?.schedule_config as ScheduleConfig | null;
-    const hasValidSchedule = !!(scheduleConfig?.available_days && scheduleConfig.available_days.length > 0);
+    const hasValidSchedule = !!(scheduleConfig?.available_days && scheduleConfig?.available_days.length > 0);
 
     // 3. Generate session rows
     interface SessionRow {

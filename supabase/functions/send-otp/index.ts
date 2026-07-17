@@ -61,7 +61,8 @@ Deno.serve(async (req) => {
       message: "OTP sent successfully",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[send-otp] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }

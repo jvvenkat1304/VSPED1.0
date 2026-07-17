@@ -18,9 +18,89 @@ function getRazorpayAuth(): string {
   return "Basic " + btoa(`${keyId}:${keySecret}`);
 }
 
+/**
+ * Get or create the proposal_payments record. Returns the payment record or an error Response.
+ */
+async function getOrCreatePaymentRecord(
+  proposalId: string,
+  parentId: string,
+  educatorId: string,
+  subtotal: number,
+  gst: number,
+  totalInr: number
+): Promise<{ payment?: Record<string, unknown>; error?: Response }> {
+  const { data: existing } = await supabaseAdmin
+    .from("proposal_payments")
+    .select("*")
+    .eq("proposal_id", proposalId)
+    .single();
+
+  if (existing) return { payment: existing };
+
+  const { data: newPayment, error: createError } = await supabaseAdmin
+    .from("proposal_payments")
+    .insert({
+      proposal_id: proposalId,
+      parent_id: parentId,
+      educator_id: educatorId,
+      subtotal_inr: subtotal,
+      gst_inr: gst,
+      total_inr: totalInr,
+      status: "pending",
+    })
+    .select()
+    .single();
+
+  if (createError || !newPayment) {
+    console.error("Failed to create payment record:", createError?.message);
+    return { error: Response.json({ success: false, message: "Failed to create payment record" }, { status: 500 }) };
+  }
+
+  return { payment: newPayment };
+}
+
+/**
+ * Create a Razorpay Payment Link and return the response data.
+ */
+async function createRazorpayPaymentLink(
+  totalPaise: number,
+  totalSessions: number,
+  proposalId: string,
+  parentId: string,
+  educatorId: string,
+  user: { phone?: string; email?: string; user_metadata?: { full_name?: string } }
+): Promise<{ link?: Record<string, unknown>; error?: Response }> {
+  const customerDetails: Record<string, string> = {};
+  if (user.phone) customerDetails.contact = user.phone;
+  if (user.email) customerDetails.email = user.email;
+  if (user.user_metadata?.full_name) customerDetails.name = user.user_metadata.full_name;
+
+  const payload: Record<string, unknown> = {
+    amount: totalPaise,
+    currency: "INR",
+    description: `V-SPED: ${totalSessions} session package`,
+    customer: Object.keys(customerDetails).length > 0 ? customerDetails : undefined,
+    notify: { sms: !!user.phone, email: !!user.email },
+    notes: { proposal_id: proposalId, parent_id: parentId, educator_id: educatorId, platform: "v-sped" },
+  };
+
+  const response = await fetch(`${RAZORPAY_BASE}/payment_links`, {
+    method: "POST",
+    headers: { "Authorization": getRazorpayAuth(), "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    console.error("Razorpay payment link creation failed:", await response.text());
+    return { error: Response.json({ success: false, message: "Failed to create payment link" }, { status: 502 }) };
+  }
+
+  return { link: await response.json() };
+}
+
 Deno.serve(async (req) => {
   try {
-    // --- 1. Auth: verify JWT ---
+    // --- 1. Auth ---
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
@@ -36,18 +116,13 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    // --- 2. Parse request ---
-    const body = await req.json();
-    const { proposal_id } = body;
-
+    // --- 2. Validate ---
+    const { proposal_id } = await req.json();
     if (!proposal_id) {
-      return Response.json(
-        { success: false, message: "proposal_id is required" },
-        { status: 400 }
-      );
+      return Response.json({ success: false, message: "proposal_id is required" }, { status: 400 });
     }
 
-    // --- 3. Fetch proposal and verify ownership ---
+    // --- 3. Fetch and verify proposal ---
     const { data: proposal, error: proposalError } = await supabaseAdmin
       .from("session_proposals")
       .select("id, parent_id, educator_id, total_sessions, proposed_rate_inr, status")
@@ -55,154 +130,72 @@ Deno.serve(async (req) => {
       .single();
 
     if (proposalError || !proposal) {
-      return Response.json(
-        { success: false, message: "Proposal not found" },
-        { status: 404 }
-      );
+      return Response.json({ success: false, message: "Proposal not found" }, { status: 404 });
     }
-
     if (proposal.parent_id !== user.id) {
-      return Response.json(
-        { success: false, message: "You are not authorized to pay for this proposal" },
-        { status: 403 }
-      );
+      return Response.json({ success: false, message: "You are not authorized to pay for this proposal" }, { status: 403 });
     }
-
-    // Only allow payment for accepted proposals
     if (!['accepted', 'parent_accepted'].includes(proposal.status)) {
-      return Response.json(
-        { success: false, message: "Proposal must be accepted before payment" },
-        { status: 422 }
-      );
+      return Response.json({ success: false, message: "Proposal must be accepted before payment" }, { status: 422 });
     }
 
-    // --- 4. Check/create proposal_payments record ---
-    let { data: payment } = await supabaseAdmin
-      .from("proposal_payments")
-      .select("*")
-      .eq("proposal_id", proposal_id)
-      .single();
-
-    // Calculate amounts
+    // --- 4. Calculate amounts ---
     const subtotal = proposal.total_sessions * proposal.proposed_rate_inr;
     const gst = Math.round(subtotal * 0.18);
     const totalInr = subtotal + gst;
     const totalPaise = totalInr * 100;
 
-    if (!payment) {
-      // Create payment record
-      const { data: newPayment, error: createError } = await supabaseAdmin
-        .from("proposal_payments")
-        .insert({
-          proposal_id: proposal_id,
-          parent_id: user.id,
-          educator_id: proposal.educator_id,
-          subtotal_inr: subtotal,
-          gst_inr: gst,
-          total_inr: totalInr,
-          status: "pending",
-        })
-        .select()
-        .single();
+    // --- 5. Get or create payment record ---
+    const { payment, error: paymentErr } = await getOrCreatePaymentRecord(
+      proposal_id, user.id, proposal.educator_id, subtotal, gst, totalInr
+    );
+    if (paymentErr) return paymentErr;
 
-      if (createError || !newPayment) {
-        console.error("Failed to create payment record:", createError?.message);
-        return Response.json(
-          { success: false, message: "Failed to create payment record" },
-          { status: 500 }
-        );
-      }
-      payment = newPayment;
+    // Already paid?
+    if (payment!.status === "captured") {
+      return Response.json({ success: false, message: "This proposal has already been paid" }, { status: 409 });
     }
 
-    // If already paid, don't create another link
-    if (payment.status === "captured") {
-      return Response.json(
-        { success: false, message: "This proposal has already been paid" },
-        { status: 409 }
-      );
-    }
-
-    // If there's already a payment link that's not expired, return it
-    if (payment.razorpay_payment_link_url && payment.status === "pending") {
+    // Existing pending link? Return it.
+    if (payment!.razorpay_payment_link_url && payment!.status === "pending") {
       return Response.json({
         success: true,
-        checkout_url: payment.razorpay_payment_link_url,
-        order_id: payment.razorpay_order_id || null,
+        checkout_url: payment!.razorpay_payment_link_url,
+        order_id: payment!.razorpay_order_id || null,
         amount_paise: totalPaise,
         amount_inr: totalInr,
         currency: "INR",
       });
     }
 
-    // --- 5. Create Razorpay Payment Link ---
-    const customerDetails: Record<string, string> = {};
-    if (user.phone) customerDetails.contact = user.phone;
-    if (user.email) customerDetails.email = user.email;
-    if (user.user_metadata?.full_name) customerDetails.name = user.user_metadata.full_name;
+    // --- 6. Create Razorpay Payment Link ---
+    const { link, error: linkErr } = await createRazorpayPaymentLink(
+      totalPaise, proposal.total_sessions, proposal_id, user.id, proposal.educator_id, user
+    );
+    if (linkErr) return linkErr;
 
-    const paymentLinkPayload: Record<string, unknown> = {
-      amount: totalPaise,
-      currency: "INR",
-      description: `V-SPED: ${proposal.total_sessions} session package`,
-      customer: Object.keys(customerDetails).length > 0 ? customerDetails : undefined,
-      notify: {
-        sms: !!user.phone,
-        email: !!user.email,
-      },
-      notes: {
-        proposal_id: proposal_id,
-        parent_id: user.id,
-        educator_id: proposal.educator_id,
-        platform: "v-sped",
-      },
-      // No callback_url — Razorpay shows its own success page
-    };
-
-    const linkResponse = await fetch(`${RAZORPAY_BASE}/payment_links`, {
-      method: "POST",
-      headers: {
-        "Authorization": getRazorpayAuth(),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(paymentLinkPayload),
-    });
-
-    if (!linkResponse.ok) {
-      const error = await linkResponse.text();
-      console.error("Razorpay payment link creation failed:", error);
-      return Response.json(
-        { success: false, message: "Failed to create payment link" },
-        { status: 502 }
-      );
-    }
-
-    const paymentLink = await linkResponse.json();
-
-    // --- 6. Update payment record with Razorpay details ---
+    // --- 7. Update payment record ---
     await supabaseAdmin
       .from("proposal_payments")
       .update({
-        razorpay_order_id: paymentLink.order_id || null,
-        razorpay_payment_link_id: paymentLink.id,
-        razorpay_payment_link_url: paymentLink.short_url,
+        razorpay_order_id: link!.order_id || null,
+        razorpay_payment_link_id: link!.id,
+        razorpay_payment_link_url: link!.short_url,
       })
-      .eq("id", payment.id);
+      .eq("id", payment!.id);
 
-    // --- 7. Return checkout URL ---
     return Response.json({
       success: true,
-      checkout_url: paymentLink.short_url,
-      payment_link_id: paymentLink.id,
-      order_id: paymentLink.order_id || null,
+      checkout_url: link!.short_url,
+      payment_link_id: link!.id,
+      order_id: link!.order_id || null,
       amount_paise: totalPaise,
       amount_inr: totalInr,
       currency: "INR",
       key_id: Deno.env.get("RAZORPAY_KEY_ID")!,
     });
-
   } catch (err) {
-    console.error("Server error:", err);
+    console.error("[create-payment-order] error:", err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

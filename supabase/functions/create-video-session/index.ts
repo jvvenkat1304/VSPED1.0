@@ -29,13 +29,13 @@ async function generateVideoSDKToken(): Promise<string> {
   const encoder = new TextEncoder();
 
   const headerB64 = btoa(JSON.stringify(header))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+    .replaceAll("=", "")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_");
   const payloadB64 = btoa(JSON.stringify(payload))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+    .replaceAll("=", "")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_");
 
   const data = `${headerB64}.${payloadB64}`;
 
@@ -48,10 +48,10 @@ async function generateVideoSDKToken(): Promise<string> {
   );
 
   const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
-  const sigB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+  const sigB64 = btoa(String.fromCodePoint(...new Uint8Array(signature)))
+    .replaceAll("=", "")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_");
 
   return `${data}.${sigB64}`;
 }
@@ -168,14 +168,12 @@ Deno.serve(async (req) => {
       if (updateError) {
         console.error("Failed to update session with roomId:", updateError.message);
       }
-    } else {
+    } else if (session.status === "accepted") {
       // Room already exists — if session is still 'accepted', mark as in_progress
-      if (session.status === "accepted") {
-        await supabaseAdmin
-          .from("sessions")
-          .update({ status: "in_progress" })
-          .eq("id", session_id);
-      }
+      await supabaseAdmin
+        .from("sessions")
+        .update({ status: "in_progress" })
+        .eq("id", session_id);
     }
 
     // --- 6. Return join details ---

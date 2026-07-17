@@ -69,7 +69,7 @@ function hasLetter(s: string): boolean {
 
 /** Check that a string contains at least one digit. */
 function hasDigit(s: string): boolean {
-  return /[0-9]/.test(s);
+  return /\d/.test(s);
 }
 
 /**
@@ -146,12 +146,12 @@ export function validateCrrFormat(crrNumber: string): ValidationResult {
 
   // Step 5: After prefix, strip optional separator (/ or -)
   let remainder = normalized.slice(prefix.length);
-  if (remainder.length > 0 && (remainder[0] === "/" || remainder[0] === "-")) {
+  if (remainder.startsWith("/") || remainder.startsWith("-")) {
     remainder = remainder.slice(1);
   }
 
   // Step 6: Count digits in the remainder — must have at least 3
-  const digitCount = (remainder.match(/[0-9]/g) || []).length;
+  const digitCount = (remainder.match(/\d/g) || []).length;
   if (digitCount < MIN_DIGITS_AFTER_PREFIX) {
     return {
       valid: false,
@@ -162,7 +162,7 @@ export function validateCrrFormat(crrNumber: string): ValidationResult {
 
   // Step 7: Overall pattern match for the full normalized string
   // Pattern: 2-4 uppercase letters, optional separator, 3-10 digits, optional separator, 0-6 alphanumeric suffix
-  const pattern = /^[A-Z]{2,4}[/\-]?[0-9]{3,10}[/\-]?[A-Z0-9]{0,6}$/;
+  const pattern = /^[A-Z]{2,4}[/-]?\d{3,10}[/-]?[A-Z0-9]{0,6}$/;
   if (!pattern.test(normalized)) {
     return {
       valid: false,

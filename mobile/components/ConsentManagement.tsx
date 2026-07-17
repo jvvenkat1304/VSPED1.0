@@ -43,6 +43,14 @@ interface ConsentGrant {
   expires_at: string | null;
 }
 
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function ConsentManagement({ sessionToken }: ConsentManagementProps) {
   const [grants, setGrants] = useState<ConsentGrant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,18 +164,11 @@ export default function ConsentManagement({ sessionToken }: ConsentManagementPro
         Alert.alert('Error', data.error || 'Failed to revoke consent. Please try again.');
       }
     } catch (error) {
+      console.error('[ConsentManagement] revoke error:', error);
       Alert.alert('Error', 'Network error. Please try again.');
     } finally {
       setRevokingId(null);
     }
-  }
-
-  function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
   }
 
   if (loading) {

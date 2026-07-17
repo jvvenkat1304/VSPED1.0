@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
@@ -16,7 +17,7 @@ const BASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co/functions/v1';
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
 
 export default function PinEntryPage() {
-  const { user_id, session_token, role } = useLocalSearchParams<{ user_id: string; session_token: string; role: string }>();
+  const { user_id, role } = useLocalSearchParams<{ user_id: string; role: string }>();
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,11 +55,38 @@ export default function PinEntryPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Update global auth store with the verified session
-        const sessionToken = data.session_token || session_token || '';
         const userRole = data.role || role || 'parent';
-        await useAuthStore.getState().setAuth(user_id || '', sessionToken, data.refresh_token || '', userRole);
-        // PIN verified — navigate based on role
+
+        // PIN verified. Now get a valid session token.
+        // verify-pin doesn't return tokens, so we refresh using the stored refresh token.
+        const storedRefreshToken = await SecureStore.getItemAsync('refresh_token');
+
+        if (storedRefreshToken) {
+          // Set user info first so the store knows who we are
+          await useAuthStore.getState().setAuth(
+            user_id || '',
+            '', // temporary — will be replaced by refresh
+            storedRefreshToken,
+            userRole
+          );
+          // Now refresh to get a valid access token
+          const refreshed = await useAuthStore.getState().refreshSession();
+          if (!refreshed) {
+            // Refresh failed — token expired. User must re-authenticate via OTP.
+            setError('Session expired. Please verify with OTP again.');
+            setPin('');
+            setLoading(false);
+            return;
+          }
+        } else {
+          // No refresh token stored — user must re-authenticate
+          setError('Session expired. Please verify with OTP again.');
+          setPin('');
+          setLoading(false);
+          return;
+        }
+
+        // Navigate based on role
         if (userRole === 'special_educator') {
           router.replace('/dashboard/educator');
         } else {
@@ -69,6 +97,7 @@ export default function PinEntryPage() {
         setPin('');
       }
     } catch (err) {
+      console.error('[PinEntry] verify error:', err);
       setError('Network error');
       setPin('');
     } finally {

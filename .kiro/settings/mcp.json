@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sonarqube": {
+      "command": "C:\\Users\\karan\\AppData\\Local\\sonarqube-cli\\bin\\sonar.exe",
+      "args": ["run", "mcp"],
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

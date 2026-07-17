@@ -74,7 +74,8 @@ Deno.serve(async (req) => {
       message: "Consent revoked immediately. The educator can no longer access this child's data.",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[revoke-consent] error:', err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 });

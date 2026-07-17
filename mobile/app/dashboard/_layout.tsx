@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuthStore } from '../../store/authStore';
 
 const Colors = {
@@ -12,6 +12,15 @@ const Colors = {
 export default function DashboardLayout() {
   const role = useAuthStore(state => state.role);
   const isEducator = role === 'special_educator';
+
+  // Guard: don't render tabs until role is hydrated — prevents wrong tabs flashing
+  if (!role) {
+    return (
+      <View style={layoutStyles.loading}>
+        <ActivityIndicator size="large" color={Colors.accent} />
+      </View>
+    );
+  }
 
   return (
     <Tabs
@@ -90,3 +99,12 @@ export default function DashboardLayout() {
     </Tabs>
   );
 }
+
+const layoutStyles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+  },
+});

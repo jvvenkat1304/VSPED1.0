@@ -57,6 +57,31 @@ interface CounterForm {
   counter_notes: string;
 }
 
+function getStatusColor(status: string) {
+  switch (status) {
+    case 'pending':
+      return Colors.accent;
+    case 'accepted':
+    case 'parent_accepted':
+    case 'paid':
+      return Colors.success;
+    case 'rejected':
+      return Colors.warning;
+    case 'countered':
+      return Colors.secondary;
+    case 'expired':
+    case 'withdrawn':
+      return Colors.textLight;
+    default:
+      return Colors.textLight;
+  }
+}
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function EducatorProposalsInbox({ sessionToken }: EducatorProposalsInboxProps) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,9 +217,9 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
   async function handleCounterSubmit() {
     if (!counterForm) return;
 
-    const rate = parseInt(counterForm.counter_rate_inr, 10);
-    const sessionsPerWeek = parseInt(counterForm.counter_sessions_per_week, 10);
-    const totalSessions = parseInt(counterForm.counter_total_sessions, 10);
+    const rate = Number.parseInt(counterForm.counter_rate_inr, 10);
+    const sessionsPerWeek = Number.parseInt(counterForm.counter_sessions_per_week, 10);
+    const totalSessions = Number.parseInt(counterForm.counter_total_sessions, 10);
 
     if (!rate || rate < 1) {
       Alert.alert('Validation', 'Please enter a valid counter rate.');
@@ -240,31 +265,6 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
     } finally {
       setActionLoading(null);
     }
-  }
-
-  function getStatusColor(status: string) {
-    switch (status) {
-      case 'pending':
-        return Colors.accent;
-      case 'accepted':
-      case 'parent_accepted':
-      case 'paid':
-        return Colors.success;
-      case 'rejected':
-        return Colors.warning;
-      case 'countered':
-        return Colors.secondary;
-      case 'expired':
-      case 'withdrawn':
-        return Colors.textLight;
-      default:
-        return Colors.textLight;
-    }
-  }
-
-  function formatDate(dateStr: string) {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function renderProposalCard(proposal: Proposal, showActions: boolean) {
@@ -355,7 +355,7 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
                 style={styles.counterInput}
                 value={counterForm.counter_rate_inr}
                 onChangeText={(text) =>
-                  setCounterForm({ ...counterForm, counter_rate_inr: text.replace(/[^0-9]/g, '') })
+                  setCounterForm({ ...counterForm, counter_rate_inr: text.replace(/\D/g, '') })
                 }
                 keyboardType="numeric"
                 placeholder="Rate per session"
@@ -369,7 +369,7 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
                 style={styles.counterInput}
                 value={counterForm.counter_sessions_per_week}
                 onChangeText={(text) =>
-                  setCounterForm({ ...counterForm, counter_sessions_per_week: text.replace(/[^0-9]/g, '') })
+                  setCounterForm({ ...counterForm, counter_sessions_per_week: text.replace(/\D/g, '') })
                 }
                 keyboardType="numeric"
                 placeholder="1-7"
@@ -383,7 +383,7 @@ export default function EducatorProposalsInbox({ sessionToken }: EducatorProposa
                 style={styles.counterInput}
                 value={counterForm.counter_total_sessions}
                 onChangeText={(text) =>
-                  setCounterForm({ ...counterForm, counter_total_sessions: text.replace(/[^0-9]/g, '') })
+                  setCounterForm({ ...counterForm, counter_total_sessions: text.replace(/\D/g, '') })
                 }
                 keyboardType="numeric"
                 placeholder="Total number of sessions"

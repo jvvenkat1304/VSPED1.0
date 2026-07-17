@@ -42,7 +42,6 @@ export default function VideoSession({
   onEnd,
 }: VideoSessionProps) {
   const [state, setState] = useState<SessionState>('idle');
-  const [roomId, setRoomId] = useState<string | null>(null);
 
   async function handleJoinSession() {
     setState('loading');
@@ -65,8 +64,6 @@ export default function VideoSession({
         return;
       }
 
-      setRoomId(data.roomId);
-
       // Build prebuilt meeting URL with token for auth
       const meetingUrl =
         `${data.meetingUrl}?token=${encodeURIComponent(data.token)}` +
@@ -84,6 +81,7 @@ export default function VideoSession({
         setState('idle');
       }
     } catch (error) {
+      console.error('[VideoSession] join error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
       setState('idle');
     }
@@ -113,7 +111,8 @@ export default function VideoSession({
 
               setState('ended');
               onEnd?.();
-            } catch {
+            } catch (err) {
+              console.error('[VideoSession] end session error:', err);
               Alert.alert('Error', 'Failed to end session. Please try again.');
             }
           },

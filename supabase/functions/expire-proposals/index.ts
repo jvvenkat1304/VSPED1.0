@@ -29,7 +29,8 @@ Deno.serve(async (_req) => {
       expired_count: expiredCount,
       message: `Expired ${expiredCount} stale proposals`,
     });
-  } catch (_err) {
+  } catch (err) {
+    console.error('[expire-proposals] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }

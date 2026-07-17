@@ -38,7 +38,7 @@ async function verifyWebhookSignature(
   if (computed.length !== signature.length) return false;
   let mismatch = 0;
   for (let i = 0; i < computed.length; i++) {
-    mismatch |= computed.charCodeAt(i) ^ signature.charCodeAt(i);
+    mismatch |= computed.codePointAt(i)! ^ signature.codePointAt(i)!;
   }
   return mismatch === 0;
 }
@@ -68,10 +68,6 @@ Deno.serve(async (req) => {
         break;
       }
       case "subscription.activated": {
-        await handleSubscriptionCharged(entity);
-        break;
-      }
-      case "subscription.charged": {
         await handleSubscriptionCharged(entity);
         break;
       }

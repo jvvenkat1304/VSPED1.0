@@ -60,7 +60,8 @@ Deno.serve(async (req) => {
       message: isNewUser ? "OTP verified - please create PIN" : "OTP verified",
     });
 
-  } catch (_err) {
+  } catch (err) {
+    console.error('[verify-otp] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }

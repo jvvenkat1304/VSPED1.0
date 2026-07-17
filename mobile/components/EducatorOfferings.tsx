@@ -108,7 +108,7 @@ export default function EducatorOfferings({ sessionToken }: { sessionToken: stri
         available_days: availableDays,
         session_start_time: startTime,
         session_end_time: endTime,
-        recommended_weeks: parseInt(recommendedWeeks, 10) || 0,
+        recommended_weeks: Number.parseInt(recommendedWeeks, 10) || 0,
         schedule_notes: notes,
       };
 

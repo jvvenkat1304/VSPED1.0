@@ -16,13 +16,16 @@ export default function StarterPage() {
   const isLoading = useAuthStore(state => state.isLoading);
 
   useEffect(() => {
-    checkExistingSession();
-  }, []);
+    // Wait for auth store to finish hydrating before checking session
+    if (!isLoading) {
+      checkExistingSession();
+    }
+  }, [isLoading]);
 
   const checkExistingSession = async () => {
-    const userId = await SecureStore.getItemAsync('user_id');
+    // Read from the store (already hydrated) rather than racing with SecureStore
+    const { userId, role: storedRole } = useAuthStore.getState();
     const hasPin = await SecureStore.getItemAsync('has_pin');
-    const storedRole = await SecureStore.getItemAsync('role');
 
     if (userId && hasPin === 'true') {
       // Returning user on same device — go straight to PIN

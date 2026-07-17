@@ -36,6 +36,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   cancelled: { label: 'Cancelled', color: Colors.warning, bg: '#fef2f2' },
 };
 
+function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) +
+    ' at ' + date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 export default function ClassroomScreen() {
   const sessionToken = useAuthStore(state => state.sessionToken) || '';
   const role = useAuthStore(state => state.role);
@@ -92,12 +98,6 @@ export default function ClassroomScreen() {
   const completedSessions = sessions.filter(
     s => s.status === 'completed' || s.status === 'cancelled'
   );
-
-  function formatDateTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) +
-      ' at ' + date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-  }
 
   if (loading) {
     return (

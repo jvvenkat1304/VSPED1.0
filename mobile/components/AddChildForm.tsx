@@ -46,9 +46,9 @@ export default function AddChildForm({ onSuccess, onCancel }: AddChildFormProps)
       return;
     }
 
-    const day = parseInt(dobDay, 10);
-    const month = parseInt(dobMonth, 10);
-    const year = parseInt(dobYear, 10);
+    const day = Number.parseInt(dobDay, 10);
+    const month = Number.parseInt(dobMonth, 10);
+    const year = Number.parseInt(dobYear, 10);
 
     if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2000 || year > new Date().getFullYear()) {
       setError('Please enter a valid date of birth');
@@ -86,6 +86,7 @@ export default function AddChildForm({ onSuccess, onCancel }: AddChildFormProps)
         setError((data.message || 'Failed to add child.') + detail);
       }
     } catch (err) {
+      console.error('[AddChildForm] error:', err);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -119,7 +120,7 @@ export default function AddChildForm({ onSuccess, onCancel }: AddChildFormProps)
             placeholder="DD"
             placeholderTextColor={Colors.placeholder}
             value={dobDay}
-            onChangeText={(t) => setDobDay(t.replace(/[^0-9]/g, '').slice(0, 2))}
+            onChangeText={(t) => setDobDay(t.replace(/\D/g, '').slice(0, 2))}
             keyboardType="number-pad"
             maxLength={2}
           />
@@ -128,7 +129,7 @@ export default function AddChildForm({ onSuccess, onCancel }: AddChildFormProps)
             placeholder="MM"
             placeholderTextColor={Colors.placeholder}
             value={dobMonth}
-            onChangeText={(t) => setDobMonth(t.replace(/[^0-9]/g, '').slice(0, 2))}
+            onChangeText={(t) => setDobMonth(t.replace(/\D/g, '').slice(0, 2))}
             keyboardType="number-pad"
             maxLength={2}
           />
@@ -137,7 +138,7 @@ export default function AddChildForm({ onSuccess, onCancel }: AddChildFormProps)
             placeholder="YYYY"
             placeholderTextColor={Colors.placeholder}
             value={dobYear}
-            onChangeText={(t) => setDobYear(t.replace(/[^0-9]/g, '').slice(0, 4))}
+            onChangeText={(t) => setDobYear(t.replace(/\D/g, '').slice(0, 4))}
             keyboardType="number-pad"
             maxLength={4}
           />

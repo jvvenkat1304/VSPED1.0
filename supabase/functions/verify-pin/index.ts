@@ -96,6 +96,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (err) {
+    console.error('[verify-pin] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }

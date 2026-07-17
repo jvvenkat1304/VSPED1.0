@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       .limit(1)
       .single();
 
-    if (!payment || !payment.razorpay_payment_id) {
+    if (!payment?.razorpay_payment_id) {
       return Response.json({ success: true, status: "pending", message: "No payment link found" });
     }
 

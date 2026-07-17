@@ -24,21 +24,21 @@ const Colors = {
   white: '#ffffff',
 };
 
+function handleManagePin() {
+  Alert.alert('Coming Soon', 'PIN management will be available in the next update.');
+}
+
+function handleDeleteAccount() {
+  Alert.alert(
+    'Delete Account',
+    'To delete your account and all associated data, please contact support at support@vsped.in',
+    [{ text: 'OK' }]
+  );
+}
+
 export default function Settings() {
   const userId = useAuthStore((state) => state.userId);
   const role = useAuthStore((state) => state.role);
-
-  function handleManagePin() {
-    Alert.alert('Coming Soon', 'PIN management will be available in the next update.');
-  }
-
-  function handleDeleteAccount() {
-    Alert.alert(
-      'Delete Account',
-      'To delete your account and all associated data, please contact support at support@vsped.in',
-      [{ text: 'OK' }]
-    );
-  }
 
   function confirmLogout() {
     Alert.alert(

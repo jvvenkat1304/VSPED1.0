@@ -84,7 +84,7 @@ async function authenticateAdmin(
     .eq("id", user.id)
     .single();
 
-  if (roleError || !userData || userData.role !== "admin") {
+  if (roleError || userData?.role !== "admin") {
     return {
       error: Response.json(
         { success: false, message: "Admin access required" },
@@ -100,6 +100,32 @@ async function authenticateAdmin(
 /**
  * Handle POST: Admin verifies or rejects an educator.
  */
+/**
+ * Build the update payload for educator profile based on admin action.
+ */
+function buildVerificationPayload(
+  action: string,
+  adminId: string,
+  newStatus: string,
+  reason?: string,
+  notes?: string
+): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    verification_status: newStatus,
+    verified_by: adminId,
+  };
+
+  if (action === "verify") {
+    payload.is_verified = true;
+  } else {
+    payload.is_verified = false;
+    payload.rejection_reason = reason?.trim() ?? null;
+  }
+
+  if (notes) payload.audit_notes = notes;
+  return payload;
+}
+
 async function handlePost(req: Request, adminId: string): Promise<Response> {
   // Parse request body
   let body: {
@@ -110,39 +136,25 @@ async function handlePost(req: Request, adminId: string): Promise<Response> {
   };
   try {
     body = await req.json();
-  } catch {
-    return Response.json(
-      { success: false, message: "Invalid request body" },
-      { status: 400 }
-    );
+  } catch (err) {
+    console.error('[admin-verify-educator] invalid request body:', err);
+    return Response.json({ success: false, message: "Invalid request body" }, { status: 400 });
   }
 
   const { educator_id, action, reason, notes } = body;
 
-  // Validate required fields
+  // Validate
   if (!educator_id || !action) {
-    return Response.json(
-      { success: false, message: "educator_id and action are required" },
-      { status: 400 }
-    );
+    return Response.json({ success: false, message: "educator_id and action are required" }, { status: 400 });
   }
-
   if (action !== "verify" && action !== "reject") {
-    return Response.json(
-      { success: false, message: "action must be 'verify' or 'reject'" },
-      { status: 400 }
-    );
+    return Response.json({ success: false, message: "action must be 'verify' or 'reject'" }, { status: 400 });
+  }
+  if (action === "reject" && !reason?.trim()) {
+    return Response.json({ success: false, message: "Rejection reason is required" }, { status: 400 });
   }
 
-  // For rejection, reason is required
-  if (action === "reject" && (!reason || reason.trim().length === 0)) {
-    return Response.json(
-      { success: false, message: "Rejection reason is required" },
-      { status: 400 }
-    );
-  }
-
-  // Fetch educator profile
+  // Fetch educator
   const { data: profile, error: fetchError } = await supabaseAdmin
     .from("educator_profiles")
     .select("id, verification_status, is_verified")
@@ -150,59 +162,30 @@ async function handlePost(req: Request, adminId: string): Promise<Response> {
     .single();
 
   if (fetchError || !profile) {
-    return Response.json(
-      { success: false, message: "Educator profile not found" },
-      { status: 404 }
-    );
+    return Response.json({ success: false, message: "Educator profile not found" }, { status: 404 });
   }
 
   // Validate state transition
   const currentStatus = profile.verification_status;
-  const transitions = ALLOWED_TRANSITIONS[currentStatus];
+  const newStatus = ALLOWED_TRANSITIONS[currentStatus]?.[action];
 
-  if (!transitions || !transitions[action]) {
-    return Response.json(
-      { success: false, message: "Invalid status transition" },
-      { status: 422 }
-    );
+  if (!newStatus) {
+    return Response.json({ success: false, message: "Invalid status transition" }, { status: 422 });
   }
 
-  const newStatus = transitions[action];
+  // Update profile
+  const updatePayload = buildVerificationPayload(action, adminId, newStatus, reason, notes);
 
-  // Build update payload
-  const updatePayload: Record<string, unknown> = {
-    verification_status: newStatus,
-    verified_by: adminId,
-  };
-
-  if (action === "verify") {
-    updatePayload.is_verified = true;
-    if (notes) {
-      updatePayload.audit_notes = notes;
-    }
-  } else if (action === "reject") {
-    updatePayload.is_verified = false;
-    updatePayload.rejection_reason = reason!.trim();
-    if (notes) {
-      updatePayload.audit_notes = notes;
-    }
-  }
-
-  // Update educator profile
   const { error: updateError } = await supabaseAdmin
     .from("educator_profiles")
     .update(updatePayload)
     .eq("id", educator_id);
 
   if (updateError) {
-    return Response.json(
-      { success: false, message: "Failed to update educator profile" },
-      { status: 500 }
-    );
+    return Response.json({ success: false, message: "Failed to update educator profile" }, { status: 500 });
   }
 
-  // Insert audit log entry
-  const ipAddress = getClientIp(req);
+  // Audit log
   const { error: auditError } = await supabaseAdmin
     .from("verification_audit_log")
     .insert({
@@ -211,12 +194,11 @@ async function handlePost(req: Request, adminId: string): Promise<Response> {
       new_status: newStatus,
       actor_id: adminId,
       actor_type: "admin",
-      reason: reason ? reason.trim() : null,
-      ip_address: ipAddress,
+      reason: reason?.trim() ?? null,
+      ip_address: getClientIp(req),
     });
 
   if (auditError) {
-    // Log but don't fail — the update itself succeeded
     console.error("Failed to insert audit log:", auditError.message);
   }
 
@@ -241,8 +223,8 @@ async function handleGet(req: Request): Promise<Response> {
   const city = params.get("city");
   const fromDate = params.get("from_date");
   const toDate = params.get("to_date");
-  const limit = Math.min(Math.max(parseInt(params.get("limit") || "20", 10) || 20, 1), 100);
-  const offset = Math.max(parseInt(params.get("offset") || "0", 10) || 0, 0);
+  const limit = Math.min(Math.max(Number.parseInt(params.get("limit") || "20", 10) || 20, 1), 100);
+  const offset = Math.max(Number.parseInt(params.get("offset") || "0", 10) || 0, 0);
 
   // Build query
   let query = supabaseAdmin
@@ -331,7 +313,8 @@ Deno.serve(async (req) => {
       { success: false, message: "Method not allowed" },
       { status: 405 }
     );
-  } catch (_err) {
+  } catch (err) {
+    console.error('[admin-verify-educator] error:', err);
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 }
