@@ -10,6 +10,7 @@ import {
 import { router } from 'expo-router';
 import { createClient } from '@supabase/supabase-js';
 import { Colors, Fonts, Spacing, BorderRadius } from '../constants/theme';
+import { useAuthStore } from '../store/authStore';
 
 const SUPABASE_URL = 'https://fedpulmkxjqoaxlanqhg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlZHB1bG1reGpxb2F4bGFucWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTQ4NzQsImV4cCI6MjA5MjMzMDg3NH0.ZmRQQrW14sWgnGOK1YhxeRNXvdkurmQh-WKUHs3YIow';
@@ -138,17 +139,20 @@ export default function NotificationFeed({ sessionToken }: NotificationFeedProps
       markAsRead(notification.id);
     }
 
-    // Navigate based on notification type and metadata
+    // Navigate based on notification type — role-aware routing
+    const userRole = useAuthStore.getState().role;
+    const homeRoute = userRole === 'special_educator' ? '/dashboard/educator' : '/dashboard/parent';
+
     const proposalId = notification.metadata?.proposal_id;
 
     if (proposalId) {
-      // For proposal-related notifications, navigate to proposals view
-      router.push('/dashboard/parent');
+      // Proposal-related: go to the user's home (proposals are shown inline)
+      router.push(homeRoute);
       return;
     }
 
     if (notification.type === 'consent_granted') {
-      // Navigate educator to their clients view
+      // Educator: navigate to their clients view
       router.push('/dashboard/educator');
       return;
     }

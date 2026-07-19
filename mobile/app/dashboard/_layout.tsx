@@ -24,6 +24,7 @@ export default function DashboardLayout() {
 
   return (
     <Tabs
+      initialRouteName={isEducator ? 'educator' : 'parent'}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -41,7 +42,7 @@ export default function DashboardLayout() {
         },
       }}
     >
-      {/* Parent tabs */}
+      {/* Parent Home — hidden for educators */}
       <Tabs.Screen
         name="parent"
         options={{
@@ -49,9 +50,10 @@ export default function DashboardLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏠</Text>,
           href: isEducator ? null : '/dashboard/parent',
         }}
+        redirect={isEducator}
       />
 
-      {/* Educator tab — shown as Home for educators */}
+      {/* Educator Home — hidden for parents */}
       <Tabs.Screen
         name="educator"
         options={{
@@ -59,6 +61,7 @@ export default function DashboardLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🏠</Text>,
           href: isEducator ? '/dashboard/educator' : null,
         }}
+        redirect={!isEducator}
       />
 
       <Tabs.Screen
@@ -74,9 +77,9 @@ export default function DashboardLayout() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🔍</Text>,
-          // Educators don't need search (they are the ones being searched)
           href: isEducator ? null : '/dashboard/search',
         }}
+        redirect={isEducator}
       />
 
       <Tabs.Screen
@@ -92,9 +95,9 @@ export default function DashboardLayout() {
         options={{
           title: 'Games',
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🎮</Text>,
-          // Only parents see games tab
           href: isEducator ? null : '/dashboard/games',
         }}
+        redirect={isEducator}
       />
     </Tabs>
   );
