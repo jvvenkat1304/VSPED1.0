@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ganita Prakash · Class 8 · Chapter 1 — A Square and a Cube</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#1f2733; --muted:#5b6675;
+    --line:#e3e8f0; --brand:#2f6df6; --brand-soft:#eaf1ff;
+    --green:#1f9d6b; --green-soft:#e6f7ef; --amber:#e08a1e; --amber-soft:#fdf1de;
+    --violet:#7c4dff; --violet-soft:#f0ebff; --rose:#e5484d; --rose-soft:#fdeaea;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 8px 24px rgba(20,30,50,.06);
+    --radius:16px;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 18px 80px}
+  header.hero{background:linear-gradient(135deg,#2f6df6,#7c4dff);color:#fff;padding:38px 0 30px;margin-bottom:8px}
+  header.hero .wrap{padding-top:0;padding-bottom:0}
+  .kicker{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;opacity:.9;font-weight:600}
+  header.hero h1{margin:.3em 0 .2em;font-size:2rem;line-height:1.15}
+  header.hero p{margin:.2em 0 0;opacity:.95;max-width:60ch}
+  .chips{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:5px 11px;border-radius:999px;font-size:.82rem}
+
+  nav.toc{position:sticky;top:0;z-index:20;background:rgba(246,248,251,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-bottom:22px}
+  nav.toc .wrap{padding-top:10px;padding-bottom:10px;display:flex;gap:6px;overflow-x:auto}
+  nav.toc a{white-space:nowrap;font-size:.85rem;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:999px;border:1px solid transparent}
+  nav.toc a:hover{background:var(--brand-soft);color:var(--brand)}
+
+  section{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:22px}
+  section h2{margin:.1em 0 .1em;font-size:1.35rem}
+  .lead{color:var(--muted);margin:.2em 0 1.1em}
+  h3{font-size:1.05rem;margin:1.3em 0 .5em}
+  p{margin:.6em 0}
+  .num{font-family:var(--mono)}
+
+  /* Parent guide box */
+  .parent{background:var(--green-soft);border:1px solid #bfe8d4;border-radius:12px;padding:14px 16px;margin:14px 0}
+  .parent .tag{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--green);font-size:.82rem;letter-spacing:.03em;text-transform:uppercase}
+  .parent ul{margin:.5em 0 .2em;padding-left:1.1em}
+  .parent li{margin:.28em 0}
+  .parent p{margin:.45em 0}
+
+  .callout{background:var(--amber-soft);border:1px solid #f2d6a0;border-radius:12px;padding:12px 15px;margin:14px 0;font-size:.95rem}
+  .callout b{color:var(--amber)}
+
+  button.btn{font:inherit;cursor:pointer;border:1px solid var(--brand);background:var(--brand);color:#fff;padding:9px 16px;border-radius:10px;font-weight:600;transition:transform .05s ease, box-shadow .15s}
+  button.btn:hover{box-shadow:0 6px 16px rgba(47,109,246,.28)}
+  button.btn:active{transform:translateY(1px)}
+  button.ghost{background:#fff;color:var(--brand)}
+  button.mini{padding:6px 12px;font-size:.85rem;border-radius:8px}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+  label.ctl{font-size:.9rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+  input[type=range]{accent-color:var(--brand)}
+  .val{font-family:var(--mono);font-weight:700;color:var(--brand);min-width:2.2em;display:inline-block;text-align:center;background:var(--brand-soft);border-radius:6px;padding:1px 6px}
+
+  /* Locker puzzle */
+  .lockers{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px;margin:14px 0}
+  .locker{aspect-ratio:3/4;border-radius:8px;border:1px solid #b7c1d1;background:#d7dfea;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.86rem;font-weight:600;color:#6b7688;position:relative;cursor:pointer;transition:background .18s,color .18s,border-color .18s,box-shadow .18s,transform .12s}
+  .locker::after{content:"";position:absolute;left:6px;top:9px;bottom:9px;width:3px;border-radius:2px;background:rgba(30,45,70,.14)}
+  .locker.open{background:var(--green);border-color:#137150;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+  .locker.open::after{background:rgba(255,255,255,.4)}
+  .locker.sq{border-color:#d99a1c;box-shadow:0 0 0 3px #f4d581}
+  .locker.sq::before{content:"★";position:absolute;top:0;right:3px;font-size:.62rem;color:#fff;text-shadow:0 0 2px rgba(0,0,0,.35)}
+  .locker.active{transform:translateY(-3px) scale(1.07);box-shadow:0 0 0 3px #f4c04e,0 7px 16px rgba(224,138,30,.4);z-index:2}
+  .locker.sel{outline:3px solid var(--brand);outline-offset:2px}
+  .legendrow{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0 2px;font-size:.85rem;color:var(--muted)}
+  .legendrow span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:17px;height:17px;border-radius:5px;border:1px solid var(--line);display:inline-block}
+  .whybox{margin:14px 0;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fbfcff}
+  .whybox h3{margin:.1em 0 .3em}
+  .pairs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .pair{border:1px solid var(--line);border-radius:8px;padding:5px 11px;font-family:var(--mono);background:#fff;font-size:.9rem}
+  .pair.self{border-color:#d99a1c;background:#fdf4dd;font-weight:700;color:#9a6a12}
+
+  /* Dot square */
+  .dotwrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+  #dotgrid{display:grid;gap:4px;padding:8px;background:#f2f4f8;border-radius:10px}
+  .dot{width:16px;height:16px;border-radius:4px;background:var(--brand);transition:background .25s, transform .25s}
+  .dot.g0{background:var(--brand)} .dot.g1{background:var(--violet)} .dot.g2{background:var(--amber)}
+  .dot.g3{background:var(--green)} .dot.g4{background:var(--rose)} .dot.g5{background:#0ea5b7}
+  .dot.g6{background:#d1477a} .dot.g7{background:#8a6d3b}
+  .legend{font-size:.9rem;color:var(--muted)}
+
+  table.grid{border-collapse:collapse;width:100%;font-size:.9rem;margin:10px 0}
+  table.grid th,table.grid td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-family:var(--mono)}
+  table.grid th{background:var(--brand-soft);color:var(--brand)}
+  td.hl{background:var(--green-soft);color:var(--green);font-weight:700}
+
+  .factorbox{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  .fgroup{border:1.5px dashed var(--line);border-radius:10px;padding:8px 10px;display:flex;gap:6px;flex-wrap:wrap;background:#fbfcfe}
+  .fgroup.matched{border-color:var(--green);background:var(--green-soft)}
+  .prime{font-family:var(--mono);background:#fff;border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-weight:700}
+
+  /* 3D cube */
+  .scene{width:230px;height:230px;perspective:760px;margin:8px 0;cursor:grab;touch-action:none;user-select:none;flex:0 0 auto}
+  .scene:active{cursor:grabbing}
+  .cube3d{position:absolute;top:50%;left:50%;width:150px;height:150px;margin:-75px 0 0 -75px;transform-style:preserve-3d;transition:transform .08s linear}
+  .face3d{position:absolute;width:150px;height:150px;display:grid}
+  .face3d .u{border:1px solid rgba(255,255,255,.55)}
+  .f-front{background:#7c4dff;transform:translateZ(75px)}
+  .f-back{background:#5a34c8;transform:rotateY(180deg) translateZ(75px)}
+  .f-right{background:#5f39d6;transform:rotateY(90deg) translateZ(75px)}
+  .f-left{background:#5230b8;transform:rotateY(-90deg) translateZ(75px)}
+  .f-top{background:#9b7bff;transform:rotateX(90deg) translateZ(75px)}
+  .f-bottom{background:#4a2ca6;transform:rotateX(-90deg) translateZ(75px)}
+  .rotbtns{display:flex;gap:8px;margin-top:6px}
+  /* adaptive quiz */
+  .levelbar{display:flex;align-items:center;gap:10px;margin:4px 0 16px;flex-wrap:wrap}
+  .diffbadge{font-size:.74rem;font-weight:700;padding:3px 11px;border-radius:999px;letter-spacing:.02em}
+  .d1{background:var(--green-soft);color:var(--green)}
+  .d2{background:var(--amber-soft);color:var(--amber)}
+  .d3{background:var(--rose-soft);color:var(--rose)}
+  .qprogress{font-size:.85rem;color:var(--muted)}
+  .lvpip{width:30px;height:7px;border-radius:4px;background:var(--line);transition:background .3s}
+  .lvpip.l1{background:var(--green)} .lvpip.l2{background:var(--amber)} .lvpip.l3{background:var(--rose)}
+  .qsummary{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--brand-soft)}
+  .steps{margin:11px 0 2px;padding:10px 14px 8px;background:#f7f9fc;border-left:3px solid var(--brand);border-radius:8px;font-size:.92rem}
+  .steps .stitle{font-weight:700;color:var(--brand);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em}
+  .steps ol{margin:.4em 0 .1em;padding-left:1.3em}
+  .steps li{margin:.28em 0;font-family:var(--mono)}
+  .hintlink{background:none;border:none;color:var(--brand);font:inherit;cursor:pointer;padding:6px 0;text-decoration:underline;font-size:.9rem}
+  .ansinput{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:9px;width:150px;font-family:var(--mono)}
+  .fmt-tag{font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin-left:8px}
+
+  /* quiz */
+  .q{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+  .q p.stem{font-weight:600;margin:0 0 10px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font:inherit;transition:.12s}
+  .opt:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .opt.correct{background:var(--green-soft);border-color:var(--green);color:var(--green);font-weight:700}
+  .opt.wrong{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+  .feedback{margin-top:9px;font-size:.9rem;min-height:1.2em}
+  .feedback.ok{color:var(--green)} .feedback.no{color:var(--rose)}
+  .score{font-weight:700;color:var(--brand)}
+
+  details.hist{margin-top:8px}
+  details.hist summary{cursor:pointer;font-weight:600;color:var(--brand)}
+  footer{color:var(--muted);font-size:.85rem;text-align:center;margin-top:30px}
+  .pill{display:inline-block;background:var(--violet-soft);color:var(--violet);border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:600}
+  @media(max-width:560px){header.hero h1{font-size:1.55rem}section{padding:18px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Ganita Prakash · Class 8 Mathematics · Chapter 1</div>
+    <h1>A Square and a Cube</h1>
+    <p>An interactive lesson for learning at home. Read the green <b>Parent notes</b>, then explore each activity together with your child — every idea here is something to <em>try</em>, not memorise.</p>
+    <div class="chips">
+      <span class="chip">⏱ ~60–90 min (can split across days)</span>
+      <span class="chip">👪 Parent + child</span>
+      <span class="chip">✏️ Keep a notebook handy</span>
+      <span class="chip">📶 Works offline</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#start">For parents</a>
+    <a href="#locker">Locker puzzle</a>
+    <a href="#squares">Square numbers</a>
+    <a href="#odd">Odd-number pattern</a>
+    <a href="#digits">Last-digit clues</a>
+    <a href="#roots">Square roots</a>
+    <a href="#factor">Prime factors</a>
+    <a href="#cubes">Cubes</a>
+    <a href="#taxicab">1729</a>
+    <a href="#check">Check yourself</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- FOR PARENTS -->
+  <section id="start">
+    <span class="pill">Start here</span>
+    <h2>How to use this lesson</h2>
+    <p class="lead">You don't need to be “good at maths” to teach this well. Your job is to sit beside your child, run each activity, and ask the questions we suggest. The discovery does the teaching.</p>
+    <div class="parent">
+      <span class="tag">🎯 What your child will learn</span>
+      <ul>
+        <li>What <b>square numbers</b> (n²) and <b>cube numbers</b> (n³) really are — as shapes, not just multiplication.</li>
+        <li>How to <b>spot</b> a perfect square, and estimate a <b>square root</b> without a calculator.</li>
+        <li>How to use <b>prime factorisation</b> to find square roots and cube roots.</li>
+        <li>That patterns (odd numbers, last digits) turn “hard” sums into quick reasoning.</li>
+      </ul>
+    </div>
+    <div class="parent">
+      <span class="tag">🗣 How to run it</span>
+      <p>Go section by section, top to bottom. At each interactive, let your child move the sliders and click first — <b>before</b> you explain. Ask “What do you notice?” and “Can you predict the next one?”. Being a little wrong and then checking is exactly how this chapter is meant to be learned.</p>
+    </div>
+    <div class="callout">
+      <b>Common wobble to expect:</b> children often confuse “2 squared” with “2 × 2 = 4” vs “2 + 2”. The dot-square activity below fixes this instantly, because they can literally <em>see</em> the square. Come back to it whenever they slip.
+    </div>
+  </section>
+
+  <!-- LOCKER PUZZLE -->
+  <section id="locker">
+    <h2>🔓 The 100 Lockers Puzzle</h2>
+    <p class="lead">The chapter opens with this famous puzzle. Run it and watch which lockers are left open — the answer hides a big idea.</p>
+    <p>There are 100 closed lockers and 100 students. Student 1 toggles <b>every</b> locker (opens them all). Student 2 toggles every <b>2nd</b> locker. Student 3 every <b>3rd</b>, and so on up to student 100. “Toggle” means: if it's closed, open it; if it's open, close it.</p>
+    <div class="controls">
+      <button class="btn" id="lockStep">▶ Next student</button>
+      <button class="btn ghost mini" id="lockRun">⏩ Run all</button>
+      <button class="btn ghost mini" id="lockReset">↺ Reset</button>
+      <span class="val" id="lockLabel">Student 0</span>
+    </div>
+    <div class="legendrow">
+      <span><i class="swatch" style="background:#d7dfea;border-color:#b7c1d1"></i> Closed</span>
+      <span><i class="swatch" style="background:#1f9d6b;border-color:#137150"></i> Open</span>
+      <span><i class="swatch" style="background:#fff;box-shadow:0 0 0 3px #f4d581;border-color:#d99a1c"></i> Perfect square ★</span>
+      <span><i class="swatch" style="background:#f4c04e;border-color:#e08a1e"></i> Being toggled now</span>
+    </div>
+    <div class="lockers" id="lockers"></div>
+    <p id="lockMsg" class="legend"></p>
+
+    <div class="whybox">
+      <h3>💡 Why do only the perfect squares stay open?</h3>
+      <p class="legend" id="whyHint">👆 Click any locker above to see the reason for that number.</p>
+      <div class="pairs" id="whyPairs"></div>
+      <p id="whyExplain"></p>
+    </div>
+
+    <div class="parent">
+      <span class="tag">🗣 The core idea (say this out loud together)</span>
+      <p>Every locker is toggled <b>once for each of its factors</b>. Factors normally come in <b>pairs</b> — for locker 12: (1×12), (2×6), (3×4). Six factors, an <b>even</b> number of toggles → it ends up <b>closed</b>.</p>
+      <p>A perfect square is different. Locker 36 = 6 × 6, and its factor list is (1×36), (2×18), (3×12), (4×9), and <b>(6×6)</b>. That last pair is the square root <b>paired with itself</b> — so it counts as one factor, not two. That gives an <b>odd</b> number of factors, an odd number of toggles, and the locker stays <b>open</b>.</p>
+      <p>Put another way (this links to the <a href="#factor">prime-factors</a> activity): a perfect square is the only kind of number whose factors reduce to a single unique pair <b>X × X</b>. Ask your child to click lockers 12 and 36 above and spot the difference.</p>
+    </div>
+  </section>
+
+  <!-- SQUARE NUMBERS -->
+  <section id="squares">
+    <h2>⬛ What “squared” actually means</h2>
+    <p class="lead">A square number is what you get when a number of dots can be arranged into a perfect square. That's where the name comes from.</p>
+    <div class="controls">
+      <label class="ctl">n = <input type="range" id="sqRange" min="1" max="12" value="5"><span class="val" id="sqVal">5</span></label>
+    </div>
+    <div class="dotwrap">
+      <div id="dotgrid" aria-label="grid of dots forming a square"></div>
+      <div>
+        <p style="font-size:1.3rem;margin:.2em 0"><span class="num" id="sqExpr">5 × 5 = 5² = 25</span></p>
+        <p class="legend" id="sqWords">A 5 by 5 square holds <b>25</b> dots.</p>
+        <p class="legend">Say it as “<b>five squared</b>”, written <span class="num">5²</span>. The small <span class="num">2</span> means “used as a factor twice”.</p>
+      </div>
+    </div>
+    <div class="parent">
+      <span class="tag">🍎 Everyday link</span>
+      <p>Ask your child to arrange 16 grapes (or coins) into a square. They'll make 4 rows of 4. Now try 12 grapes — it <em>won't</em> make a full square. That “doesn't fit” feeling is what “not a perfect square” means.</p>
+    </div>
+    <details class="hist"><summary>Where does the word come from?</summary>
+      <p>In Sanskrit, a square number is <b>varga</b> and a cube is <b>ghana</b>. The word “root” comes from the Sanskrit <b>mula</b>, meaning basis or origin — the number a square “grows” from. Babylonian clay tablets listed squares and cubes as far back as 1700 BCE.</p>
+    </details>
+  </section>
+
+  <!-- ODD NUMBER PATTERN -->
+  <section id="odd">
+    <h2>➕ Squares are hidden sums of odd numbers</h2>
+    <p class="lead">Watch the square grow one L-shaped layer at a time. Each new layer adds the next odd number.</p>
+    <div class="controls">
+      <button class="btn" id="oddStep">▶ Add next layer</button>
+      <button class="btn ghost mini" id="oddReset">↺ Reset</button>
+    </div>
+    <div class="dotwrap">
+      <div id="oddgrid" style="display:grid;gap:4px;padding:8px;background:#f2f4f8;border-radius:10px"></div>
+      <div>
+        <p class="num" id="oddSum" style="font-size:1.15rem">1 = 1 = 1²</p>
+        <p class="legend">Each coloured “L” is the next odd number: 1, 3, 5, 7, … and the running total is always a perfect square.</p>
+      </div>
+    </div>
+    <div class="parent">
+      <span class="tag">🗣 The takeaway</span>
+      <p>1 + 3 + 5 + 7 + … The sum of the first <b>n</b> odd numbers is always <b>n²</b>. So the difference between one square and the next is just an odd number — that's why <span class="num">126² = 125² + 125 + 126 = 15625 + 251 = 15876</span> without long multiplication.</p>
+    </div>
+  </section>
+
+  <!-- LAST DIGIT -->
+  <section id="digits">
+    <h2>🔎 Last-digit detective</h2>
+    <p class="lead">Perfect squares can only ever end in <b>0, 1, 4, 5, 6, or 9</b>. So any number ending in 2, 3, 7 or 8 is <em>instantly</em> not a perfect square.</p>
+    <table class="grid" id="digitTable"><tbody></tbody></table>
+    <div class="controls">
+      <label class="ctl">Is this a perfect square? <input id="sqTest" type="number" min="0" placeholder="type a number" style="font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;width:150px"></label>
+      <button class="btn mini" id="sqTestBtn">Check clue</button>
+    </div>
+    <p id="sqTestOut" class="feedback"></p>
+    <div class="parent">
+      <span class="tag">⚠️ Careful</span>
+      <p>Ending in 0,1,4,5,6,9 is a <b>clue, not a guarantee</b>. 26 ends in 6 but isn't a perfect square. The last digit can only <em>rule numbers out</em>, never confirm. Also: a perfect square has an even number of trailing zeros (100 ✓, 1000 ✗).</p>
+    </div>
+  </section>
+
+  <!-- SQUARE ROOTS -->
+  <section id="roots">
+    <h2>√ Square roots by estimation</h2>
+    <p class="lead">A square root undoes squaring: if <span class="num">y = x²</span> then <span class="num">x = √y</span>. Even when the answer isn't whole, we can trap it between two squares.</p>
+    <div class="controls">
+      <label class="ctl">Find √<input type="number" id="rootN" value="250" min="1" style="font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;width:110px"></label>
+      <button class="btn mini" id="rootBtn">Estimate</button>
+    </div>
+    <p id="rootOut" style="font-size:1.05rem"></p>
+    <div class="parent">
+      <span class="tag">🗣 Worked example (from the book)</span>
+      <p>√250 lies between √225 = 15 and √256 = 16. Since 250 is much closer to 256 than to 225, √250 ≈ 16 (the true value is about 15.81). Teach the <em>trapping</em> method — it builds real number sense that a calculator hides.</p>
+    </div>
+  </section>
+
+  <!-- PRIME FACTORISATION -->
+  <section id="factor">
+    <h2>🧩 Roots by prime factorisation</h2>
+    <p class="lead">Break a number into its prime factors, then try to split them into equal groups. For a <b>square root</b> you need <b>two</b> identical groups; for a <b>cube root</b>, <b>three</b>.</p>
+    <div class="controls">
+      <button class="btn mini ghost" data-fn="324">√324</button>
+      <button class="btn mini ghost" data-fn="576">√576</button>
+      <button class="btn mini ghost" data-fn="3375">∛3375</button>
+      <button class="btn mini ghost" data-fn="10648">∛10648</button>
+      <label class="ctl">or your own: <input type="number" id="factorN" min="2" placeholder="e.g. 1296" style="font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;width:130px"></label>
+      <select id="factorMode" style="font:inherit;padding:7px;border:1px solid var(--line);border-radius:8px">
+        <option value="2">square root</option>
+        <option value="3">cube root</option>
+      </select>
+      <button class="btn mini" id="factorBtn">Split</button>
+    </div>
+    <p class="num" id="factorPrimes" style="font-size:1.05rem"></p>
+    <div class="factorbox" id="factorGroups"></div>
+    <p id="factorResult" style="font-size:1.1rem;font-weight:600"></p>
+    <div class="parent">
+      <span class="tag">🗣 The idea in one line</span>
+      <p>Example: 324 = (2 × 3 × 3) × (2 × 3 × 3), two identical groups, so √324 = 18. And 3375 = (3 × 5) × (3 × 5) × (3 × 5), three identical groups, so ∛3375 = 15. If the primes <em>can't</em> be split evenly, the number isn't a perfect square/cube.</p>
+    </div>
+  </section>
+
+  <!-- CUBES -->
+  <section id="cubes">
+    <h2>🧊 Cubes: multiplying three times</h2>
+    <p class="lead">A cube number stacks into a solid cube: <span class="num">n × n × n = n³</span>. 1, 8, 27, 64, 125, …</p>
+    <div class="controls">
+      <label class="ctl">n = <input type="range" id="cubeRange" min="1" max="6" value="3"><span class="val" id="cubeVal">3</span></label>
+      <button class="btn mini ghost" id="cubeSpin">⟳ Auto-rotate</button>
+    </div>
+    <div class="dotwrap">
+      <div class="scene" id="cubeScene" title="Drag to rotate">
+        <div class="cube3d" id="cube3d"></div>
+      </div>
+      <div>
+        <p class="num" id="cubeExpr" style="font-size:1.3rem">3 × 3 × 3 = 3³ = 27</p>
+        <p class="legend">🖱️ <b>Drag the cube</b> to rotate it. It's a solid <span class="num" id="cubeDim">3 × 3 × 3</span> block — length × width × height — made of <span class="num" id="cubeTot">27</span> little unit cubes.</p>
+        <p class="legend">Cubes also hide odd numbers: <span class="num">1 = 1³, &nbsp; 3+5 = 8 = 2³, &nbsp; 7+9+11 = 27 = 3³</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAXICAB -->
+  <section id="taxicab">
+    <h2>🚕 The 1729 story</h2>
+    <p class="lead">A true story about the Indian mathematician Srinivasa Ramanujan — and a number the chapter loves.</p>
+    <p>When Ramanujan was ill in hospital, the mathematician G. H. Hardy visited in taxi number <b>1729</b> and remarked it seemed a dull number. Ramanujan instantly replied that it was quite the opposite — it is the smallest number expressible as a sum of two cubes in <b>two different ways</b>.</p>
+    <div class="controls"><button class="btn" id="taxiBtn">✨ Reveal the two ways</button></div>
+    <p id="taxiOut" class="num" style="font-size:1.15rem;min-height:1.4em"></p>
+    <div class="parent">
+      <span class="tag">🗣 Why include this</span>
+      <p>It shows maths as curiosity and delight, not drills — and it's a proud moment of Indian mathematical heritage. Numbers with this property are now called <b>taxicab numbers</b>. Ask your child to verify each sum with the cube stacks above.</p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="check">
+    <h2>✅ Check yourself</h2>
+    <p class="lead">Six questions that <b>adapt</b> — get one right and the next gets harder; miss one and it eases off. Every question is <b>freshly generated</b> with new numbers and formats each time, so it never plays the same way twice. Stuck? Open the <b>step-by-step working</b> for a nudge.</p>
+    <div id="quiz">
+      <div class="levelbar">
+        <span class="qprogress" id="qprog">Question 1 of 6</span>
+        <span class="diffbadge d1" id="diffBadge">Warm-up</span>
+        <span style="flex:1;min-width:10px"></span>
+        <span class="qprogress">Levels cleared:</span>
+        <span class="lvpip" id="pip1" title="Warm-up"></span><span class="lvpip" id="pip2" title="Core"></span><span class="lvpip" id="pip3" title="Challenge"></span>
+      </div>
+      <div class="q" id="qcard"></div>
+      <div style="margin-top:12px"><button class="btn" id="qNext" disabled>Next question →</button></div>
+    </div>
+    <div class="qsummary" id="quizSummary" style="display:none;margin-top:6px"></div>
+    <p style="margin-top:14px">Score: <span class="score" id="score">0</span> / <span id="qtotal">6</span></p>
+    <div class="parent">
+      <span class="tag">👪 Next step for parents</span>
+      <p>If your child gets 5–6 right, they're ready for the book's written exercises. If they miss the root questions, revisit the <a href="#factor">prime-factorisation</a> activity together — that's the usual sticking point.</p>
+    </div>
+  </section>
+
+  <footer>
+    Interactive lesson built from NCERT <i>Ganita Prakash</i>, Class 8, Chapter 1 “A Square and a Cube” (2026–27).<br>
+    A homeschooling / NIOS teaching aid · prototype module.
+  </footer>
+</div>
+
+<script>
+/* ---------- LOCKER PUZZLE ---------- */
+(function(){
+  const N=100, wrap=document.getElementById('lockers');
+  let state=[], student=0, revealed=false, selected=0, runTimer=null;
+  const squares=new Set([1,4,9,16,25,36,49,64,81,100]);
+  function build(){
+    if(runTimer){clearInterval(runTimer);runTimer=null;}
+    wrap.innerHTML=''; state=Array(N+1).fill(false); student=0; revealed=false; selected=0;
+    for(let i=1;i<=N;i++){const d=document.createElement('div');d.className='locker';d.id='lk'+i;d.textContent=i;d.dataset.n=i;wrap.appendChild(d);}
+    document.getElementById('lockLabel').textContent='Student 0';
+    document.getElementById('lockMsg').textContent='All lockers start closed. Press “Next student”, or click any locker to explore its factors.';
+    document.getElementById('whyHint').style.display='';
+    document.getElementById('whyPairs').innerHTML='';
+    document.getElementById('whyExplain').innerHTML='';
+  }
+  function render(active){
+    for(let i=1;i<=N;i++){const el=document.getElementById('lk'+i);
+      el.className='locker'+(state[i]?' open':'')
+        +(revealed&&squares.has(i)?' sq':'')
+        +(active&&i%active===0?' active':'')
+        +(selected===i?' sel':'');}
+  }
+  function step(){
+    if(student>=N)return;
+    student++;
+    for(let i=student;i<=N;i+=student) state[i]=!state[i];
+    document.getElementById('lockLabel').textContent='Student '+student;
+    if(student===N)revealed=true;
+    render(revealed?0:student);
+    if(student===N){
+      document.getElementById('lockMsg').innerHTML='<b>Done!</b> The open (green, ★) lockers are 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 — the perfect squares 1² to 10². Click one to see why.';
+    } else {
+      document.getElementById('lockMsg').textContent='Student '+student+' toggled every '+student+ordinal(student)+' locker.';
+    }
+  }
+  function ordinal(n){return n===1?'st':(n===2?'nd':(n===3?'rd':'th'));}
+  function factorPairs(n){const p=[];for(let d=1;d*d<=n;d++)if(n%d===0)p.push([d,n/d]);return p;}
+  function explain(n){
+    selected=n; render(revealed?0:student);
+    const pairs=factorPairs(n), last=pairs[pairs.length-1], isSq=(last[0]===last[1]);
+    const count=isSq?pairs.length*2-1:pairs.length*2;
+    document.getElementById('whyHint').style.display='none';
+    const pc=document.getElementById('whyPairs'); pc.innerHTML='';
+    pairs.forEach(pr=>{
+      const el=document.createElement('span');
+      if(pr[0]===pr[1]){el.className='pair self';el.innerHTML=pr[0]+' × '+pr[1]+' &nbsp;(√'+n+' × √'+n+')';}
+      else{el.className='pair';el.textContent=pr[0]+' × '+pr[1];}
+      pc.appendChild(el);
+    });
+    const ex=document.getElementById('whyExplain');
+    if(isSq){
+      ex.innerHTML='Locker <b>'+n+'</b> = '+last[0]+' × '+last[0]+'. Its factors are '+count+' — an <b>ODD</b> number, because the root '+last[0]+' pairs with <b>itself</b> (gold). Odd factors → toggled an odd number of times → <b style="color:var(--green)">stays OPEN</b>. ✔';
+    } else {
+      ex.innerHTML='Locker <b>'+n+'</b> has '+count+' factors — an <b>EVEN</b> number, because every factor has a different partner. Even factors → toggled an even number of times → <b>ends up CLOSED</b>.';
+    }
+  }
+  wrap.addEventListener('click',e=>{const c=e.target.closest('.locker');if(c)explain(+c.dataset.n);});
+  document.getElementById('lockStep').onclick=step;
+  document.getElementById('lockReset').onclick=build;
+  document.getElementById('lockRun').onclick=function(){if(runTimer)return;runTimer=setInterval(()=>{if(student>=N){clearInterval(runTimer);runTimer=null;return;}step();},55);};
+  build();
+})();
+
+/* ---------- DOT SQUARE ---------- */
+(function(){
+  const grid=document.getElementById('dotgrid'), r=document.getElementById('sqRange');
+  function draw(){
+    const n=+r.value;
+    grid.style.gridTemplateColumns='repeat('+n+',1fr)';
+    grid.innerHTML='';
+    for(let i=0;i<n*n;i++){const d=document.createElement('div');d.className='dot';grid.appendChild(d);}
+    document.getElementById('sqVal').textContent=n;
+    document.getElementById('sqExpr').textContent=n+' × '+n+' = '+n+'² = '+(n*n);
+    document.getElementById('sqWords').innerHTML='A '+n+' by '+n+' square holds <b>'+(n*n)+'</b> dots.';
+  }
+  r.oninput=draw; draw();
+})();
+
+/* ---------- ODD-NUMBER GNOMON ---------- */
+(function(){
+  const grid=document.getElementById('oddgrid'); let n=0;
+  function reset(){n=0;grid.innerHTML='';grid.style.gridTemplateColumns='repeat(1,1fr)';document.getElementById('oddSum').textContent='Press “Add next layer”.';}
+  function step(){
+    if(n>=10)return;
+    n++;
+    grid.style.gridTemplateColumns='repeat('+n+',1fr)';
+    grid.innerHTML='';
+    for(let row=0;row<n;row++)for(let col=0;col<n;col++){
+      const layer=Math.max(row,col); // which L-shell
+      const d=document.createElement('div');d.className='dot g'+(layer%8);grid.appendChild(d);
+    }
+    let terms=[];for(let k=1;k<=n;k++)terms.push(2*k-1);
+    document.getElementById('oddSum').innerHTML=terms.join(' + ')+' = '+(n*n)+' = '+n+'²';
+  }
+  document.getElementById('oddStep').onclick=step;
+  document.getElementById('oddReset').onclick=reset;
+  reset();
+})();
+
+/* ---------- LAST DIGIT TABLE ---------- */
+(function(){
+  const body=document.querySelector('#digitTable tbody');
+  let r1='<tr><th>n</th>',r2='<tr><th>n²</th>',r3='<tr><th>last digit</th>';
+  const good=new Set([0,1,4,5,6,9]);
+  for(let i=1;i<=10;i++){const s=i*i,ld=s%10;
+    r1+='<td>'+i+'</td>';r2+='<td>'+s+'</td>';r3+='<td class="'+(good.has(ld)?'hl':'')+'">'+ld+'</td>';}
+  body.innerHTML=r1+'</tr>'+r2+'</tr>'+r3+'</tr>';
+  document.getElementById('sqTestBtn').onclick=function(){
+    const v=parseInt(document.getElementById('sqTest').value,10);
+    const out=document.getElementById('sqTestOut');
+    if(isNaN(v)||v<0){out.className='feedback no';out.textContent='Type a whole number first.';return;}
+    const ld=v%10, root=Math.round(Math.sqrt(v)), isSq=(root*root===v);
+    if(!good.has(ld)){out.className='feedback no';out.innerHTML='Ends in <b>'+ld+'</b> → it <b>cannot</b> be a perfect square. (Ruled out instantly!)';}
+    else if(isSq){out.className='feedback ok';out.innerHTML='Ends in '+ld+' (possible) — and yes! '+v+' = '+root+'².';}
+    else{out.className='feedback no';out.innerHTML='Ends in '+ld+' (looked possible) but it is <b>not</b> a perfect square — the last digit is only a clue.';}
+  };
+})();
+
+/* ---------- SQUARE ROOT ESTIMATION ---------- */
+document.getElementById('rootBtn').onclick=function(){
+  const n=parseInt(document.getElementById('rootN').value,10);
+  const out=document.getElementById('rootOut');
+  if(isNaN(n)||n<1){out.textContent='Enter a positive whole number.';return;}
+  const lo=Math.floor(Math.sqrt(n)), hi=lo+1;
+  if(lo*lo===n){out.innerHTML='√'+n+' = <b>'+lo+'</b> exactly, because '+lo+'² = '+n+'.';return;}
+  const dLo=n-lo*lo, dHi=hi*hi-n, near=dLo<dHi?lo:hi;
+  out.innerHTML='√'+n+' is trapped between √'+(lo*lo)+' = '+lo+' and √'+(hi*hi)+' = '+hi+'.<br>'+
+    n+' is closer to '+(near*near)+', so √'+n+' ≈ <b>'+near+'</b> &nbsp;(calculator: '+Math.sqrt(n).toFixed(3)+').';
+};
+
+/* ---------- PRIME FACTORISATION ---------- */
+(function(){
+  function primes(n){const f=[];let d=2;while(d*d<=n){while(n%d===0){f.push(d);n/=d;}d++;}if(n>1)f.push(n);return f;}
+  function run(n,k){
+    const P=document.getElementById('factorPrimes'),G=document.getElementById('factorGroups'),R=document.getElementById('factorResult');
+    if(isNaN(n)||n<2){P.textContent='';G.innerHTML='';R.textContent='Enter a number of 2 or more.';return;}
+    const f=primes(n);
+    P.innerHTML=n+' = '+f.join(' × ');
+    // count each prime
+    const counts={};f.forEach(p=>counts[p]=(counts[p]||0)+1);
+    const perfect=Object.values(counts).every(c=>c%k===0);
+    G.innerHTML='';
+    if(perfect){
+      let root=1;for(const p in counts){root*=Math.pow(+p,counts[p]/k);}
+      for(let g=0;g<k;g++){
+        const box=document.createElement('div');box.className='fgroup matched';
+        const grp=[];for(const p in counts){for(let c=0;c<counts[p]/k;c++)grp.push(p);}
+        grp.forEach(p=>{const s=document.createElement('span');s.className='prime';s.textContent=p;box.appendChild(s);});
+        G.appendChild(box);
+      }
+      R.className='';R.style.color='var(--green)';
+      R.innerHTML=(k===2?'√':'∛')+n+' = <b>'+root+'</b> — the primes split into '+k+' identical groups. ✓';
+    } else {
+      // show primes ungrouped
+      const box=document.createElement('div');box.className='fgroup';
+      f.forEach(p=>{const s=document.createElement('span');s.className='prime';s.textContent=p;box.appendChild(s);});
+      G.appendChild(box);
+      R.style.color='var(--rose)';
+      R.innerHTML=n+' is <b>not</b> a perfect '+(k===2?'square':'cube')+' — the primes can’t be shared into '+k+' equal groups.';
+    }
+  }
+  document.querySelectorAll('[data-fn]').forEach(b=>b.onclick=function(){
+    const v=+b.dataset.fn, k=(b.textContent.indexOf('∛')>=0)?3:2;
+    document.getElementById('factorMode').value=k;document.getElementById('factorN').value=v;run(v,k);
+  });
+  document.getElementById('factorBtn').onclick=function(){
+    run(parseInt(document.getElementById('factorN').value,10),+document.getElementById('factorMode').value);
+  };
+  run(324,2);
+})();
+
+/* ---------- 3D CUBE ---------- */
+(function(){
+  const scene=document.getElementById('cubeScene'), cube=document.getElementById('cube3d'), r=document.getElementById('cubeRange');
+  const faces=['f-front','f-back','f-right','f-left','f-top','f-bottom'];
+  let rotX=-24, rotY=-32, spin=null;
+  function apply(){cube.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';}
+  function build(){
+    const n=+r.value; cube.innerHTML='';
+    faces.forEach(f=>{
+      const d=document.createElement('div');d.className='face3d '+f;
+      d.style.gridTemplateColumns='repeat('+n+',1fr)';
+      d.style.gridTemplateRows='repeat('+n+',1fr)';
+      for(let i=0;i<n*n;i++){const u=document.createElement('div');u.className='u';d.appendChild(u);}
+      cube.appendChild(d);
+    });
+    document.getElementById('cubeVal').textContent=n;
+    document.getElementById('cubeExpr').textContent=n+' × '+n+' × '+n+' = '+n+'³ = '+(n*n*n);
+    document.getElementById('cubeDim').textContent=n+' × '+n+' × '+n;
+    document.getElementById('cubeTot').textContent=(n*n*n);
+    apply();
+  }
+  let dragging=false,lx=0,ly=0;
+  scene.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;try{scene.setPointerCapture(e.pointerId);}catch(_){}});
+  scene.addEventListener('pointermove',e=>{if(!dragging)return;rotY+=(e.clientX-lx)*0.5;rotX-=(e.clientY-ly)*0.5;rotX=Math.max(-89,Math.min(89,rotX));lx=e.clientX;ly=e.clientY;apply();});
+  scene.addEventListener('pointerup',()=>{dragging=false;});
+  scene.addEventListener('pointercancel',()=>{dragging=false;});
+  document.getElementById('cubeSpin').onclick=function(){
+    if(spin){clearInterval(spin);spin=null;this.textContent='⟳ Auto-rotate';}
+    else{this.textContent='⏸ Stop';spin=setInterval(()=>{rotY=(rotY+1)%360;apply();},40);}
+  };
+  r.oninput=build; build();
+})();
+
+/* ---------- TAXICAB ---------- */
+document.getElementById('taxiBtn').onclick=function(){
+  document.getElementById('taxiOut').innerHTML='1729 = 1³ + 12³ = 1 + 1728 &nbsp;&nbsp;<b>and</b>&nbsp;&nbsp; 1729 = 9³ + 10³ = 729 + 1000 ✔';
+};
+
+/* ---------- ADAPTIVE QUIZ (procedurally generated) ---------- */
+(function(){
+  /* ---- helpers ---- */
+  const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+  const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+  const choose=a=>a[Math.floor(Math.random()*a.length)];
+  function opts(correct,makers){                 // build 4 distinct numeric options incl. correct
+    const seen=new Set([correct]),out=[correct];let g=0;
+    while(out.length<4&&g<60){g++;const v=choose(makers)();if(v!=null&&v>=0&&!seen.has(v)){seen.add(v);out.push(v);}}
+    let d=1;while(out.length<4){const v=correct+d;if(v>=0&&!seen.has(v)){seen.add(v);out.push(v);}d=d>0?-d:(1-d);}
+    return out;
+  }
+  const facs=n=>{const f=[];for(let d=1;d<=n;d++)if(n%d===0)f.push(d);return f;};
+
+  /* ---- question generators, grouped by difficulty ----
+     each returns {stem, correct(number), options[], steps[], format:'either'|'choice'}
+     steps: last entry is the final answer line (hidden in a pre-answer hint) ---- */
+  const GEN={1:[
+    ()=>{const n=R(2,15);return{stem:'What is '+n+'² ?',correct:n*n,options:opts(n*n,[()=>2*n,()=>n*n+n,()=>n*n-n,()=>(n+1)*(n+1)]),steps:['n² means n × n','= '+n+' × '+n,'= '+(n*n)],format:'either'};},
+    ()=>{const n=R(3,12);return{stem:'How many small squares are in an '+n+' × '+n+' grid?',correct:n*n,options:opts(n*n,[()=>4*n,()=>n+n,()=>n*n-1,()=>(n+1)*(n+1)]),steps:['Rows × columns = '+n+' × '+n,'= '+(n*n)],format:'either'};},
+    ()=>{const n=R(3,12),c=n*n,d=shuffle([c+R(1,3),c-R(1,3),(n+1)*(n+1)-R(1,4)]).slice(0,3);return{stem:'Which of these is a perfect square?',correct:c,options:shuffle([c,...d]),steps:['√'+c+' = '+n+' (a whole number) ✓','The others fall between two squares'],format:'choice'};},
+    ()=>{const k=R(2,6),t=[];for(let i=1;i<=k;i++)t.push(2*i-1);return{stem:t.join(' + ')+' = ?',correct:k*k,options:opts(k*k,[()=>k*k+2,()=>k*k-1,()=>2*k,()=>k*k+k]),steps:['Sum of the first '+k+' odd numbers = '+k+'²','= '+(k*k)],format:'either'};},
+    ()=>{const n=R(2,15);return{stem:'√'+(n*n)+' = ?',correct:n,options:opts(n,[()=>n+1,()=>n-1,()=>n*2,()=>n+2]),steps:[n+' × '+n+' = '+(n*n),'so √'+(n*n)+' = '+n],format:'either'};},
+    ()=>{const n=R(2,6);return{stem:'What is '+n+'³ ?',correct:n*n*n,options:opts(n*n*n,[()=>3*n,()=>n*n,()=>n*n*n+n,()=>n*n*n-n]),steps:['n³ = n × n × n','= '+n+' × '+n+' × '+n,'= '+(n*n*n)],format:'either'};},
+    ()=>{const n=R(4,20),c=n*n;return{stem:'A square garden has an area of '+c+' m². How long is one side?',correct:n,options:opts(n,[()=>n+1,()=>n-1,()=>c/2,()=>2*n]),steps:['side × side = area','side = √'+c,'= '+n+' m'],format:'either'};}
+  ],2:[
+    ()=>{const a=R(6,20),sq=shuffle([a,a+1,a+2]).slice(0,3).map(x=>x*x),b=R(10,25);let non;do{non=b*b+R(1,2*b);}while(sq.indexOf(non)>=0);return{stem:'Which of these is <b>not</b> a perfect square?',correct:non,options:shuffle([...sq,non]),steps:sq.map(s=>'√'+s+' = '+Math.round(Math.sqrt(s))+' ✓').concat(['√'+non+' is not a whole number → not a perfect square']),format:'choice'};},
+    ()=>{const bad=choose([2,3,7,8]),good=shuffle([0,1,4,5,6,9]).slice(0,3);return{stem:'A perfect square can <b>never</b> end in which digit?',correct:bad,options:shuffle([bad,...good]),steps:['Perfect squares end only in 0, 1, 4, 5, 6 or 9','So a square can never end in '+bad],format:'choice'};},
+    ()=>{const n=R(4,30),lo=n*n,hi=(n+1)*(n+1),N=R(lo+1,hi-1),near=(N-lo)<(hi-N)?n:n+1;return{stem:'√'+N+' is closest to which whole number?',correct:near,options:opts(near,[()=>n,()=>n+1,()=>n-1,()=>n+2]),steps:[N+' lies between '+n+'² = '+lo+' and '+(n+1)+'² = '+hi,N+' is closer to '+(near*near),'so √'+N+' ≈ '+near],format:'either'};},
+    ()=>{const k=R(6,10),t=[];for(let i=1;i<=k;i++)t.push(2*i-1);return{stem:t.join(' + ')+' = ?',correct:k*k,options:opts(k*k,[()=>k*k+k,()=>k*k-k,()=>k*(k+1),()=>k*k+1]),steps:['Sum of the first '+k+' odd numbers = '+k+'²','= '+(k*k)],format:'either'};},
+    ()=>{const n=R(11,40),base=n*n;return{stem:'Given '+n+'² = '+base+', what is '+(n+1)+'² ?',correct:(n+1)*(n+1),options:opts((n+1)*(n+1),[()=>base+n,()=>base+2*n,()=>base+n+1,()=>base+2*n+2]),steps:['(n+1)² = n² + n + (n+1)','= '+base+' + '+n+' + '+(n+1),'= '+((n+1)*(n+1))],format:'either'};},
+    ()=>{const n=R(5,30);return{stem:'How many whole numbers lie strictly between '+n+'² and '+(n+1)+'² ?',correct:2*n,options:opts(2*n,[()=>2*n+1,()=>2*n-1,()=>n,()=>2*n+2]),steps:[n+'² = '+(n*n)+' and '+(n+1)+'² = '+((n+1)*(n+1)),'Count between consecutive squares = 2n','= 2 × '+n+' = '+(2*n)],format:'either'};},
+    ()=>{const n=R(2,9);return{stem:'∛'+(n*n*n)+' = ?',correct:n,options:opts(n,[()=>n+1,()=>n-1,()=>n*n,()=>n+2]),steps:[n+' × '+n+' × '+n+' = '+(n*n*n),'so ∛'+(n*n*n)+' = '+n],format:'either'};}
+  ],3:[
+    ()=>{const n=R(50,140),base=n*n;return{stem:'Given '+n+'² = '+base+', what is '+(n+1)+'² ?',correct:(n+1)*(n+1),options:opts((n+1)*(n+1),[()=>base+2*n,()=>base+n,()=>base+2*n+2,()=>base+n+1]),steps:['(n+1)² = n² + n + (n+1)','= '+base+' + '+n+' + '+(n+1),'= '+((n+1)*(n+1))],format:'either'};},
+    ()=>{const n=choose([12,14,15,16,18,20,22,24,25,30]),c=n*n*n;return{stem:'What is ∛'+c+' ?',correct:n,options:opts(n,[()=>n+1,()=>n-1,()=>n+2,()=>n*10]),steps:['Find x with x³ = '+c,n+'³ = '+n+' × '+n+' × '+n+' = '+c,'so ∛'+c+' = '+n],format:'either'};},
+    ()=>{const p=choose([2,3,5,7]),m=R(2,6),num=m*m*p;return{stem:'What is the smallest number you must multiply '+num+' by to get a perfect square?',correct:p,options:opts(p,[()=>p*p,()=>p+1,()=>m,()=>2*p]),steps:[num+' = '+m+'² × '+p,'The prime '+p+' is unpaired','Multiply by '+p+' → '+(num*p)+' = '+(m*p)+'²','Answer: '+p],format:'either'};},
+    ()=>{const p=choose([2,3,5]),pw=choose([1,2]),m=R(2,4),num=m*m*m*Math.pow(p,pw),need=Math.pow(p,3-pw);return{stem:'What is the smallest number you must multiply '+num+' by to get a perfect cube?',correct:need,options:opts(need,[()=>p,()=>Math.pow(p,3),()=>need+1,()=>m]),steps:[num+' = '+m+'³ × '+p+(pw>1?'²':''),'The prime '+p+' appears '+pw+' time'+(pw>1?'s':'')+'; a cube needs it in threes','Multiply by '+p+'^'+(3-pw)+' = '+need,'Answer: '+need],format:'either'};},
+    ()=>{const n=R(4,12),sq=n*n,cnt=facs(sq).length;return{stem:'Locker '+sq+' stays open in the puzzle. How many factors does '+sq+' have?',correct:cnt,options:opts(cnt,[()=>cnt+1,()=>cnt-1,()=>cnt+2,()=>2*n]),steps:['Factors of '+sq+': '+facs(sq).join(', '),'That is '+cnt+' factors — an ODD number','Odd factors → toggled an odd number of times → stays open'],format:'either'};},
+    ()=>{const n=R(20,60),base=n*n;return{stem:'Given '+n+'² = '+base+', what is '+(n-1)+'² ?',correct:(n-1)*(n-1),options:opts((n-1)*(n-1),[()=>base-2*n,()=>base-n,()=>base-2*n-2,()=>base-(n-1)]),steps:['(n−1)² = n² − n − (n−1)','= '+base+' − '+n+' − '+(n-1),'= '+((n-1)*(n-1))],format:'either'};}
+  ]};
+
+  const NAMES={1:'Warm-up',2:'Core',3:'Challenge'};
+  const TOTAL=6;
+  let level,qi,score,cleared,usedGen,current;
+  const card=document.getElementById('qcard'),badge=document.getElementById('diffBadge'),nextBtn=document.getElementById('qNext');
+
+  function makeQuestion(L){
+    const pool=GEN[L], fresh=pool.filter(g=>usedGen.indexOf(g)<0);
+    const gen=choose(fresh.length?fresh:pool); usedGen.push(gen);
+    const q=gen(); q.level=L; q._gen=gen;
+    q.render=(q.format==='either')?(Math.random()<0.5?'input':'choice'):q.format;
+    if(q.render==='choice'){
+      if(q.options.indexOf(q.correct)<0)q.options[0]=q.correct;
+      q.options=shuffle(q.options.slice(0,4));
+    }
+    return q;
+  }
+  function updatePips(){for(let L=1;L<=3;L++)document.getElementById('pip'+L).className='lvpip'+(cleared[L]?' l'+L:'');}
+
+  function resolve(correctChosen,L,fb){
+    card.dataset.done='1';
+    if(correctChosen){score++;cleared[L]=true;fb.className='feedback ok';fb.innerHTML='✓ Correct.'+(L<3?' &nbsp;<b>Level up! →</b>':' &nbsp;<b>Top level held!</b>');level=Math.min(3,L+1);}
+    else{fb.className='feedback no';fb.innerHTML='✗ Not quite — see the working below.';level=Math.max(1,L-1);}
+    document.getElementById('score').textContent=score;
+    showSteps();
+    updatePips();nextBtn.disabled=false;nextBtn.textContent=(qi+1>=TOTAL)?'See result →':'Next question →';
+  }
+  function showSteps(){
+    let box=card.querySelector('.steps');
+    if(!box){box=document.createElement('div');box.className='steps';card.appendChild(box);}
+    box.innerHTML='<span class="stitle">Step-by-step working</span><ol>'+current.steps.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
+    const hl=card.querySelector('.hintlink'); if(hl)hl.style.display='none';
+  }
+
+  function render(){
+    document.getElementById('qprog').textContent='Question '+(qi+1)+' of '+TOTAL;
+    current=makeQuestion(level); const L=current.level;
+    badge.textContent=NAMES[L]; badge.className='diffbadge d'+L;
+    const fmtTag=current.render==='input'?'type the answer':'multiple choice';
+    card.innerHTML='<p class="stem">'+current.stem+'<span class="fmt-tag">'+fmtTag+'</span></p>';
+    const fb=document.createElement('div');fb.className='feedback';
+
+    if(current.render==='choice'){
+      const wrap=document.createElement('div');wrap.className='opts';
+      current.options.forEach(v=>{
+        const b=document.createElement('button');b.className='opt';b.textContent=v;
+        b.onclick=()=>{if(card.dataset.done)return;const ok=(v===current.correct);
+          b.classList.add(ok?'correct':'wrong');
+          if(!ok){[...wrap.children].forEach(c=>{if(c.textContent==String(current.correct))c.classList.add('correct');});}
+          resolve(ok,L,fb);};
+        wrap.appendChild(b);
+      });
+      card.appendChild(wrap);
+    }else{
+      const row=document.createElement('div');row.className='controls';
+      const inp=document.createElement('input');inp.type='number';inp.className='ansinput';inp.placeholder='your answer';
+      const btn=document.createElement('button');btn.className='btn mini';btn.textContent='Check';
+      btn.onclick=()=>{if(card.dataset.done)return;if(inp.value===''){return;}
+        const ok=(parseFloat(inp.value)===current.correct);inp.disabled=true;
+        inp.style.borderColor=ok?'var(--green)':'var(--rose)';
+        if(!ok)fb.innerHTML='';resolve(ok,L,fb);
+        if(!ok)fb.insertAdjacentHTML('beforeend',' The answer was <b>'+current.correct+'</b>.');};
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter')btn.click();});
+      row.appendChild(inp);row.appendChild(btn);card.appendChild(row);
+    }
+    card.appendChild(fb);
+    const hint=document.createElement('button');hint.className='hintlink';hint.textContent='🧮 Show step-by-step working';
+    hint.onclick=()=>showSteps();
+    card.appendChild(hint);
+    card.dataset.done='';nextBtn.disabled=true;nextBtn.textContent='Next question →';
+  }
+  nextBtn.onclick=()=>{qi++;if(qi>=TOTAL){finish();return;}render();};
+
+  function finish(){
+    document.getElementById('quiz').style.display='none';
+    const s=document.getElementById('quizSummary');s.style.display='';
+    const top=cleared[3]?'Challenge':(cleared[2]?'Core':(cleared[1]?'Warm-up':'—'));
+    let note;
+    if(score>=5)note='Excellent — ready for the book’s written “Figure it out” exercises, including the cube-root questions.';
+    else if(score>=3)note='Solid grasp of squares. Revisit the <a href="#factor">prime-factorisation</a> activity for roots before the written exercises.';
+    else note='Worth replaying the <a href="#squares">dot-square</a> and <a href="#locker">locker</a> activities together, then trying this quiz again.';
+    s.innerHTML='<h3 style="margin:.1em 0 .3em">Quiz complete 🎉</h3><p>Score: <b>'+score+' / '+TOTAL+'</b> &nbsp;·&nbsp; Highest level reached: <b>'+top+'</b></p><p>'+note+'</p><p style="margin-top:10px"><button class="btn mini" id="qRetry">↺ New set of questions</button></p>';
+    document.getElementById('qRetry').onclick=start;
+  }
+  function start(){
+    level=1;qi=0;score=0;cleared={1:false,2:false,3:false};usedGen=[];
+    document.getElementById('score').textContent=0;
+    document.getElementById('quizSummary').style.display='none';
+    document.getElementById('quiz').style.display='';
+    updatePips();render();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
